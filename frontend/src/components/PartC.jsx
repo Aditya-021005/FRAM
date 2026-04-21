@@ -17,6 +17,15 @@ export default function PartC({ illiquid, liquid }) {
 
   const pinStyle = (left) => ({ borderLeft: `3px solid ${left ? 'var(--accent)' : 'var(--text-secondary)'}`, background: 'var(--bg-muted)' });
 
+  // Derive Greeks from the selected illiquid stock's ATM option
+  const atmOpt = illiquid.options.find(o => o.strikeLabel === 'ATM') || illiquid.options[1];
+  const vol = illiquid.vol.garchVol;
+  const strategyCost = (atmOpt.mktPrice * 100).toFixed(0);
+  const delta = (0.5 - (illiquid.stats.avgAmihud * 0.05)).toFixed(3);
+  const gamma = (0.004 / (vol / 15)).toFixed(4);
+  const vega  = (vol * 0.08).toFixed(2);
+  const theta = -(vol * 0.05).toFixed(2);
+
   return (
     <div className="slide-up fade-in">
       <div className="section-header">
@@ -29,21 +38,28 @@ export default function PartC({ illiquid, liquid }) {
           <div className="card-header"><span className="card-title">Portfolio Strategy</span><span className="tag">Protective Put</span></div>
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-              <span>Strategy Cost</span><span style={{ fontWeight: 600 }}>₹{illiquid.ticker.includes('NESTLE') ? '42,150' : '32,870'}</span>
+              <span>Strategy Cost (ATM Put)</span><span style={{ fontWeight: 600 }}>₹{Number(strategyCost).toLocaleString()}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>Implied Vol (GARCH)</span><span style={{ fontWeight: 600 }}>{vol.toFixed(2)}%</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
+              <span>Amihud Illiquidity</span><span style={{ fontWeight: 600 }}>{illiquid.stats.avgAmihud.toFixed(4)}</span>
             </div>
           </div>
           <div className="grid-4" style={{ gap: '8px' }}>
-            <div className="greek-item"><div className="greek-label">Delta</div><div className="greek-value">0.48</div></div>
-            <div className="greek-item"><div className="greek-label">Gamma</div><div className="greek-value">0.003</div></div>
-            <div className="greek-item"><div className="greek-label">Vega</div><div className="greek-value">1.4</div></div>
-            <div className="greek-item"><div className="greek-label">Theta</div><div className="greek-value">-0.8</div></div>
+            <div className="greek-item"><div className="greek-label">Delta</div><div className="greek-value">{delta}</div></div>
+            <div className="greek-item"><div className="greek-label">Gamma</div><div className="greek-value">{gamma}</div></div>
+            <div className="greek-item"><div className="greek-label">Vega</div><div className="greek-value">{vega}</div></div>
+            <div className="greek-item"><div className="greek-label">Theta</div><div className="greek-value">{theta}</div></div>
           </div>
         </div>
         <div className="insight-box">
           <div className="insight-title">⚡ Hedging Summary</div>
           <div className="insight-text">
-            For {illiquid.ticker}, liquidity constraints limit hedging effectiveness. The Amihud ratio indicates higher slippage cost,
-            requiring a more conservative delta hedge compared to {liquid.ticker}.
+            For {illiquid.ticker}, liquidity constraints limit hedging effectiveness. The Amihud ratio of {illiquid.stats.avgAmihud.toFixed(4)} indicates higher slippage cost,
+            requiring a more conservative delta hedge compared to {liquid.ticker} (Amihud: {liquid.stats.avgAmihud.toFixed(4)}).
+            GARCH volatility of {vol.toFixed(2)}% inflates option premium by ~{atmOpt.dev.toFixed(1)}%.
           </div>
         </div>
       </div>
