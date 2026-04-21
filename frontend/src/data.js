@@ -165,6 +165,8 @@ export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
     liqReturn: (Math.random()-0.5)*0.02 + (p > 0.8 ? 0.03 : 0), 
     illiqReturn: (Math.random()-0.5)*0.015, 
     liqVol, illiqVol, 
+    liqAmihud: (Math.random() * 0.5 + 0.2) + (liqVol > 38 ? Math.random()*0.8 : 0),
+    illiqAmihud: (Math.random() * 2 + 1) + (illiqVol > 40 ? Math.random()*3 : 0),
     hdfcVaR, nestleVaR,
     isHighVolLiq: p > 0.6 && Math.sin(i*0.5) > 0.3,
     isHighVolIlliq: p > 0.7 && Math.cos(i*0.4) > 0.4
