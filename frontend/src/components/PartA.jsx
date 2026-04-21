@@ -37,22 +37,16 @@ export default function PartA({ illiquid, liquid }) {
         <p className="section-subtitle">NIFTY 50 ranking by turnover. Comparing <strong>{liquid.ticker}</strong> (Liquid) vs <strong>{illiquid.ticker}</strong> (Illiquid).</p>
       </div>
 
-      <div className="grid-4" style={{ marginBottom: 32 }}>
+      <div className="grid-2" style={{ marginBottom: 32 }}>
         <div className="stat-card">
-          <div className="stat-label">Liquid Security</div>
+          <div className="stat-label">Selected Liquid stock</div>
           <div className="stat-value">{liquid.ticker.replace('.NS', '')}</div>
+          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>Rank #{liquid.rank} · NIFTY 50</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Illiquid Security</div>
+          <div className="stat-label">Selected Illiquid stock</div>
           <div className="stat-value">{illiquid.ticker.replace('.NS', '')}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Turnover Ratio (I/L)</div>
-          <div className="stat-value">{(illiquid.stats.avgTurnover / liquid.stats.avgTurnover).toFixed(4)}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Slippage Beta</div>
-          <div className="stat-value">{(illiquid.stats.avgAmihud / liquid.stats.avgAmihud).toFixed(1)}x</div>
+          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>Rank #{illiquid.rank} · NIFTY 50</div>
         </div>
       </div>
 
