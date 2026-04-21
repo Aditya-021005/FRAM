@@ -49,6 +49,10 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
         { shock: "+1%", vShock: "+20%", total: 771.23, d: 1754.81, g: 130.69, v: 640.54, h: -1754.81 },
         { shock: "+2%", vShock: "-20%", total: -117.76, d: 3509.61, g: 522.78, v: -640.54, h: -3509.61 },
         { shock: "+2%", vShock: "+20%", total: 1163.32, d: 3509.61, g: 522.78, v: 640.54, h: -3509.61 }
+      ],
+      var: [
+        { regime: "Full Period", varPct: 2.15, varRs: 21500 },
+        { regime: "High Vol", varPct: 3.42, varRs: 34200 }
       ]
     };
   }
@@ -81,6 +85,10 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
         { shock: "+1%", vShock: "+20%", total: 5207.69, d: 2839.49, g: 394.48, v: 4813.21, h: -2839.49 },
         { shock: "+2%", vShock: "-20%", total: -3235.28, d: 5678.98, g: 1577.93, v: -4813.21, h: -5678.98 },
         { shock: "+2%", vShock: "+20%", total: 6391.14, d: 5678.98, g: 1577.93, v: 4813.21, h: -5678.98 }
+      ],
+      var: [
+        { regime: "Full Period", varPct: 1.85, varRs: 18500 },
+        { regime: "High Vol", varPct: 2.95, varRs: 29500 }
       ]
     };
   }
@@ -107,6 +115,10 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
     pnlScenarios: [
       { shock: "-2%", vShock: "-20%", total: -50, d: -100, g: 10, v: -20, h: 60 },
       { shock: "+2%", vShock: "+20%", total: 80, d: 100, g: 10, v: 20, h: -50 }
+    ],
+    var: [
+      { regime: "Full Period", varPct: 1.5 + (rank/30), varRs: 15000 + rank*150 },
+      { regime: "High Vol", varPct: 2.5 + (rank/30), varRs: 25000 + rank*150 }
     ]
   };
 };
