@@ -34,7 +34,7 @@ export default function PartA({ illiquid, liquid }) {
     <div className="slide-up fade-in">
       <div className="section-header">
         <h2 className="section-title">Stock Selection & Liquidity</h2>
-        <p className="section-subtitle">NIFTY 50 ranking by turnover. Comparing <strong>{liq.ticker}</strong> (Liquid) vs <strong>{illiquid.ticker}</strong> (Illiquid).</p>
+        <p className="section-subtitle">NIFTY 50 ranking by turnover. Comparing <strong>{liquid.ticker}</strong> (Liquid) vs <strong>{illiquid.ticker}</strong> (Illiquid).</p>
       </div>
 
       <div className="grid-4" style={{ marginBottom: 32 }}>
