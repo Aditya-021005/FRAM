@@ -147,7 +147,7 @@ export default function PartC({ illiquid, liquid }) {
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 9, color: C.amber, letterSpacing: '0.14em', marginBottom: 8 }}>PART C · GREEKS & PnL SIMULATION</div>
         <h2 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', color: '#e8e8ec', marginBottom: 6 }}>Greek Analysis & Attribution</h2>
-        <p style={{ fontSize: 11, color: '#6b6b78', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 11, color: '#e8e8ec', lineHeight: 1.7 }}>
           Comprehensive attribution of portfolio returns to Delta, Gamma, Vega, and Delta-Hedging outcomes.
         </p>
       </div>

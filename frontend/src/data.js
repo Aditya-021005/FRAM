@@ -116,21 +116,47 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
   // Fallback for others
   const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const meanReturn = isLiquidGroup ? -0.1 + (seed % 10)/200 : 0.01 + (seed % 10)/1000;
+  const spot = 1000 + (seed % 500);
+
+  const strikes = ['ATM', 'OTM_Call', 'OTM_Put'];
+  const options = strikes.flatMap(l => [29, 57].map(dte => {
+    const isATM = l === 'ATM';
+    const delta = isATM ? 0.5 + (seed % 10)/100 : (l === 'OTM_Call' ? 0.15 : -0.1);
+    return {
+      strikeLabel: l, dte, 
+      strike: isATM ? spot : (l === 'OTM_Call' ? spot + 50 : spot - 50),
+      mktPrice: 20 + (seed % 10), bsmHist: 19 + (seed % 10), bsmGarch: 22 + (seed % 10),
+      devPct: (seed % 5), delta, gamma: 0.005 + (seed % 5)/1000, vega: 0.8 + (seed % 10)/10
+    };
+  }));
+
+  const pnlScenarios = [
+    { shock: "-2%", vShock: "-20%", total: -500 + seed % 100, d: -2000, g: 400, v: -400, h: 2000 },
+    { shock: "-2%", vShock: "+20%", total: 800 + seed % 100, d: -2000, g: 400, v: 400, h: 2000 },
+    { shock: "-1%", vShock: "-20%", total: -300 + seed % 100, d: -1000, g: 100, v: -400, h: 1000 },
+    { shock: "-1%", vShock: "+20%", total: 600 + seed % 100, d: -1000, g: 100, v: 400, h: 1000 },
+    { shock: "+1%", vShock: "-20%", total: -300 + seed % 100, d: 1000, g: 100, v: -400, h: -1000 },
+    { shock: "+1%", vShock: "+20%", total: 600 + seed % 100, d: 1000, g: 100, v: 400, h: -1000 },
+    { shock: "+2%", vShock: "-20%", total: -500 + seed % 100, d: 2000, g: 400, v: -400, h: -2000 },
+    { shock: "+2%", vShock: "+20%", total: 800 + seed % 100, d: 2000, g: 400, v: 400, h: -2000 }
+  ];
+
   return { 
-    ticker, rank, 
+    ticker, rank, spot,
     stats: { 
-      meanReturn, 
-      stdReturn: 1.5, 
-      minReturn: meanReturn - 3, 
-      maxReturn: meanReturn + 3, 
-      avgTurnover: stockInfo.turnover, 
-      avgAmihud: isLiquidGroup ? 0.0004 : 0.007,
-      avgRollingVol: 15 
+      meanReturn, stdReturn: 1.5, minReturn: meanReturn - 3, maxReturn: meanReturn + 3, 
+      avgTurnover: stockInfo.turnover, avgAmihud: isLiquidGroup ? 0.0004 : 0.007, avgRollingVol: 15 
     }, 
-    vol: { histVol: 15, garchVol: 20, dailyCondVol: 1.25 }, 
+    vol: { histVol: 15, garchVol: 20, persistence: 0.98, longRunVol: 18, dailyCondVol: 1.25 }, 
     correlation: { vol_amihud: 0.2 }, 
-    options: [], pnlSummary: { netDelta: 0, netGamma: 0, netVega: 0, netPremium: 0, hedgeQty: 0, hedgeCost: 0 }, 
-    pnlScenarios: [], 
+    options,
+    pnlSummary: { 
+      strategy: "Dynamic Delta-Hedge Strip", 
+      netDelta: 150 + seed % 50, netGamma: 4 + (seed % 2), netVega: 180 + (seed % 40), 
+      netPremium: 15000 + (seed % 1000), 
+      hedgeQty: -(150 + seed % 50), hedgeCost: -(150000 + seed % 10000)
+    }, 
+    pnlScenarios,
     varAnalysis: [
       { regime: "Full Period", conf: "95%", mean: 0.01, vol: 1.2, varPct: 1.5, varRs: 15000 },
       { regime: "Full Period", conf: "99%", mean: 0.01, vol: 1.2, varPct: 2.5, varRs: 25000 },
@@ -152,30 +178,57 @@ export const LIQUID_DATA = generateStockData("HDFCBANK.NS", true);
 export const getIlliquidData = (ticker) => generateStockData(ticker, false);
 export const getLiquidData = (ticker) => generateStockData(ticker, true);
 
-export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
-  const date = new Date(2025, 10, 1);
-  date.setDate(date.getDate() + (i * 1.5));
-  const p = i / 120;
-  const liqVol = 35 + Math.sin(i * 0.1) * 2 + (p > 0.8 ? (p - 0.8) * 150 : 0) + Math.random() * 5;
-  const illiqVol = 32 + p * 15 + Math.sin(i * 0.05) * 1;
-  const hdfcVaR = 1.5 + (p * 4.5) + Math.sin(i * 0.1) * 0.3;
-  const nestleVaR = 1.4 + (p * 2.2) + Math.cos(i * 0.1) * 0.2;
-  return { 
-    date: date.toLocaleDateString("en-IN", { year:'2-digit', month: "short" }), 
-    liqReturn: (Math.random()-0.5)*0.02 + (p > 0.8 ? 0.03 : 0), 
-    illiqReturn: (Math.random()-0.5)*0.015, 
-    liqVol, illiqVol, 
-    liqAmihud: (Math.random() * 0.5 + 0.2) + (liqVol > 38 ? Math.random()*0.8 : 0),
-    illiqAmihud: (Math.random() * 2 + 1) + (illiqVol > 40 ? Math.random()*3 : 0),
-    hdfcVaR, nestleVaR,
-    isHighVolLiq: p > 0.6 && Math.sin(i*0.5) > 0.3,
-    isHighVolIlliq: p > 0.7 && Math.cos(i*0.4) > 0.4
-  };
-});
+// Simple deterministic seed from string
+const getSeed = (s1, s2) => {
+  let h1 = 0, h2 = 0;
+  for (let i = 0; i < s1.length; i++) h1 = (h1 << 5) - h1 + s1.charCodeAt(i);
+  for (let i = 0; i < s2.length; i++) h2 = (h2 << 5) - h2 + s2.charCodeAt(i);
+  return Math.abs(h1 + h2);
+};
 
-export const HISTOGRAM_DATA = Array.from({ length: 80 }, (_, i) => {
-  const x = -4 + (i * 0.1);
-  const hdfcVal = Math.exp(-Math.pow(x + 0.3, 2) / 2) / Math.sqrt(2 * Math.PI) + (x < -2 ? Math.random()*0.1 : 0);
-  const nestleVal = Math.exp(-Math.pow(x, 2) / 1.5) / Math.sqrt(2 * Math.PI * 0.75);
-  return { bi: x.toFixed(1), hdfc: hdfcVal, nestle: nestleVal };
-});
+export const getReturnsData = (liqTicker, illiqTicker) => {
+  const seed = getSeed(liqTicker, illiqTicker);
+  const data = [];
+  for (let i = 0; i < 120; i++) {
+    const p = i / 120;
+    const date = new Date(2025, 10, 1);
+    date.setDate(date.getDate() + (i * 1.5));
+    
+    // Deterministic mock generation based on seed
+    const rnd = (off) => Math.sin(seed + i + off);
+    const liqVol = 35 + (seed % 8) + Math.sin(i * 0.1) * 2 + (p > 0.8 ? (p - 0.8) * 150 : 0);
+    const illiqVol = 32 + (seed % 12) + p * 15 + Math.sin(i * 0.05) * 1;
+    const lVaR = 1.5 + (seed % 4) * 0.1 + (p * 4.5) + Math.sin(i * 0.1) * 0.3;
+    const iVaR = 1.4 + (seed % 6) * 0.1 + (p * 2.2) + Math.cos(i * 0.1) * 0.2;
+
+    data.push({
+      date: date.toLocaleDateString("en-IN", { year:'2-digit', month: "short" }),
+      liqReturn: (rnd(0) * 0.01) + (p > 0.8 ? 0.03 : 0),
+      illiqReturn: (rnd(1) * 0.01),
+      liqVol, illiqVol,
+      liqAmihud: (Math.abs(rnd(2)) * 0.5 + 0.2) + (liqVol > 38 ? 0.5 : 0),
+      illiqAmihud: (Math.abs(rnd(3)) * 2 + 1) + (illiqVol > 40 ? 2 : 0),
+      liqVaR: lVaR, illiqVaR: iVaR,
+      isHighVolLiq: p > 0.6 && Math.sin(seed + i * 0.5) > 0.3,
+      isHighVolIlliq: p > 0.7 && Math.cos(seed + i * 0.4) > 0.4
+    });
+  }
+  return data;
+};
+
+export const getHistogramData = (liqTicker, illiqTicker) => {
+  const seed = getSeed(liqTicker, illiqTicker);
+  const data = [];
+  const offset = (seed % 10) / 20 - 0.25;
+  for (let i = 0; i < 80; i++) {
+    const x = -4 + (i * 0.1);
+    const liqVal = Math.exp(-Math.pow(x + 0.3 + offset, 2) / 2) / Math.sqrt(2 * Math.PI) + (x < -2.5 ? 0.03 : 0);
+    const illiqVal = Math.exp(-Math.pow(x - offset, 2) / 1.5) / Math.sqrt(2 * Math.PI * 0.75);
+    data.push({ bi: x.toFixed(1), liqHist: liqVal, illiqHist: illiqVal });
+  }
+  return data;
+};
+
+// Legacy placeholders for initial load
+export const RETURNS_DATA = getReturnsData('HDFCBANK.NS', 'NESTLEIND.NS');
+export const HISTOGRAM_DATA = getHistogramData('HDFCBANK.NS', 'NESTLEIND.NS');

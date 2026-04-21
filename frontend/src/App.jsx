@@ -3,9 +3,12 @@ import PartA from './components/PartA';
 import PartB from './components/PartB';
 import PartC from './components/PartC';
 import PartD from './components/PartD';
-import { PROJECT_INFO, NIFTY50_RANKING, getIlliquidData, getLiquidData } from './data';
+import { 
+  PROJECT_INFO, NIFTY50_RANKING, getIlliquidData, getLiquidData, 
+  getReturnsData, getHistogramData 
+} from './data';
 
-/* ─── GLOBAL STYLES ─────────────────────────────────────────── */
+
 const GLOBAL_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
@@ -272,7 +275,7 @@ const TABS = [
 
 function Dashboard({ activeTab, setActiveTab, liquidStocks, illiquidStocks,
                      liquidTicker, illiquidTicker, setLiquidTicker, setIlliquidTicker,
-                     onHome, illiquidData, liquidData }) {
+                     onHome, illiquidData, liquidData, returnsData, histogramData }) {
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString('en-IN', { hour12: false });
@@ -378,10 +381,10 @@ function Dashboard({ activeTab, setActiveTab, liquidStocks, illiquidStocks,
 
       {/* ── CONTENT ── */}
       <main style={{ flex: 1, overflow: 'auto', padding: 24 }}>
-        {activeTab === 'Part A' && <PartA illiquid={illiquidData} liquid={liquidData} />}
-        {activeTab === 'Part B' && <PartB illiquid={illiquidData} liquid={liquidData} />}
+        {activeTab === 'Part A' && <PartA illiquid={illiquidData} liquid={liquidData} returnsData={returnsData} />}
+        {activeTab === 'Part B' && <PartB illiquid={illiquidData} liquid={liquidData} returnsData={returnsData} />}
         {activeTab === 'Part C' && <PartC illiquid={illiquidData} liquid={liquidData} />}
-        {activeTab === 'Part D' && <PartD illiquid={illiquidData} liquid={liquidData} />}
+        {activeTab === 'Part D' && <PartD illiquid={illiquidData} liquid={liquidData} returnsData={returnsData} histogramData={histogramData} />}
       </main>
 
       {/* ── FOOTER ── */}
@@ -414,6 +417,8 @@ export default function App() {
   const liquidStocks   = NIFTY50_RANKING.filter(s => s.category === 'LIQUID');
   const illiquidData   = getIlliquidData(illiquidTicker);
   const liquidData     = getLiquidData(liquidTicker);
+  const returnsData    = getReturnsData(liquidTicker, illiquidTicker);
+  const histogramData  = getHistogramData(liquidTicker, illiquidTicker);
 
   return (
     <>
@@ -441,6 +446,8 @@ export default function App() {
           onHome={() => setIsLanding(true)}
           illiquidData={illiquidData}
           liquidData={liquidData}
+          returnsData={returnsData}
+          histogramData={histogramData}
         />
       )}
     </>

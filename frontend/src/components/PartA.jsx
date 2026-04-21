@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line, ScatterChart, Scatter } from 'recharts';
-import { NIFTY50_RANKING, RETURNS_DATA, getIlliquidData, getLiquidData } from '../data';
+import { NIFTY50_RANKING, getIlliquidData, getLiquidData } from '../data';
 
 /* ── shared token palette (mirrors App.jsx vars) ── */
 const C = {
@@ -48,7 +48,7 @@ const Stat = ({ label, value, accent }) => (
 
 const barColors = (cat) => cat === 'LIQUID' ? C.amber : C.muted;
 
-export default function PartA({ illiquid, liquid }) {
+export default function PartA({ illiquid, liquid, returnsData }) {
   const liqStocks = NIFTY50_RANKING.filter(s => s.category === 'LIQUID');
   const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
   const chartData = [...liqStocks, ...illiquidStocks.slice(-3)].map(d => ({
@@ -57,7 +57,7 @@ export default function PartA({ illiquid, liquid }) {
     category: d.category,
   }));
 
-  const axisProps = { tick: { fontSize: 9, fill: '#6b6b78', fontFamily: 'IBM Plex Mono, monospace' }, axisLine: false, tickLine: false };
+  const axisProps = { tick: { fontSize: 9, fill: '#e8e8ec', fontFamily: 'IBM Plex Mono, monospace' }, axisLine: false, tickLine: false };
 
   return (
     <div style={{ fontFamily: 'IBM Plex Mono, monospace', color: '#e8e8ec', animation: 'fadeUp 0.4s ease both' }}>
@@ -66,7 +66,7 @@ export default function PartA({ illiquid, liquid }) {
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 9, color: C.amber, letterSpacing: '0.14em', marginBottom: 8 }}>PART A · STOCK SELECTION & LIQUIDITY</div>
         <h2 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', color: '#e8e8ec', marginBottom: 6 }}>Liquidity Analysis</h2>
-        <p style={{ fontSize: 11, color: '#6b6b78', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 11, color: '#e8e8ec', lineHeight: 1.7 }}>
           NIFTY 50 ranking by turnover — comparing <span style={{ color: C.green }}>{liquid.ticker}</span> (liquid) vs <span style={{ color: C.red }}>{illiquid.ticker}</span> (illiquid)
         </p>
       </div>
@@ -104,7 +104,7 @@ export default function PartA({ illiquid, liquid }) {
 
         <ChartBox title={`DAILY LOG RETURNS — ${liquid.ticker} (LIQUID)`}>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={RETURNS_DATA}>
+            <LineChart data={returnsData}>
               <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis {...axisProps} domain={[-0.06, 0.06]} />
@@ -115,7 +115,7 @@ export default function PartA({ illiquid, liquid }) {
         </ChartBox>
         <ChartBox title={`DAILY LOG RETURNS — ${illiquid.ticker} (ILLIQUID)`}>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={RETURNS_DATA}>
+            <LineChart data={returnsData}>
               <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis {...axisProps} domain={[-0.06, 0.06]} />
@@ -127,7 +127,7 @@ export default function PartA({ illiquid, liquid }) {
 
         <ChartBox title={`20-DAY ROLLING VOLATILITY — ${liquid.ticker}`}>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={RETURNS_DATA}>
+            <LineChart data={returnsData}>
               <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis {...axisProps} />
@@ -138,7 +138,7 @@ export default function PartA({ illiquid, liquid }) {
         </ChartBox>
         <ChartBox title={`20-DAY ROLLING VOLATILITY — ${illiquid.ticker}`}>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={RETURNS_DATA}>
+            <LineChart data={returnsData}>
               <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis {...axisProps} />
@@ -150,7 +150,7 @@ export default function PartA({ illiquid, liquid }) {
 
         <ChartBox title={`AMIHUD ILLIQUIDITY — ${liquid.ticker}`}>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={RETURNS_DATA}>
+            <LineChart data={returnsData}>
               <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis {...axisProps} />
@@ -161,7 +161,7 @@ export default function PartA({ illiquid, liquid }) {
         </ChartBox>
         <ChartBox title={`AMIHUD ILLIQUIDITY — ${illiquid.ticker}`}>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={RETURNS_DATA}>
+            <LineChart data={returnsData}>
               <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis {...axisProps} />
@@ -178,7 +178,7 @@ export default function PartA({ illiquid, liquid }) {
               <XAxis type="number" dataKey="liqAmihud" name="Amihud" tick={{ fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }} axisLine={false} tickLine={false} />
               <YAxis type="number" dataKey="liqVol" name="Rolling Vol" tick={{ fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }} axisLine={false} tickLine={false} />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} content={<TTip />} />
-              <Scatter data={RETURNS_DATA} fill={C.green} fillOpacity={0.5} />
+              <Scatter data={returnsData} fill={C.green} fillOpacity={0.5} />
             </ScatterChart>
           </ResponsiveContainer>
         </ChartBox>
@@ -189,7 +189,7 @@ export default function PartA({ illiquid, liquid }) {
               <XAxis type="number" dataKey="illiqAmihud" name="Amihud" tick={{ fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }} axisLine={false} tickLine={false} />
               <YAxis type="number" dataKey="illiqVol" name="Rolling Vol" tick={{ fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }} axisLine={false} tickLine={false} />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} content={<TTip />} />
-              <Scatter data={RETURNS_DATA} fill={C.red} fillOpacity={0.5} />
+              <Scatter data={returnsData} fill={C.red} fillOpacity={0.5} />
             </ScatterChart>
           </ResponsiveContainer>
         </ChartBox>
@@ -269,8 +269,10 @@ export default function PartA({ illiquid, liquid }) {
             <div style={{ fontSize: 9, color: C.amber, letterSpacing: '0.12em', marginBottom: 12 }}>CORRELATION MATRIX — {s.ticker} ({label})</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: '#e8e8ec' }}>
               <thead>
-                <tr>
-                  {['', 'VOL', 'AMIHUD'].map(h => <th key={h} style={{ padding: '6px 10px', textAlign: 'right', fontSize: 9, color: '#e8e8ec', fontWeight: 700 }}>{h}</th>)}
+                <tr style={{ background: '#0a0a0b' }}>
+                  {['', 'VOL', 'AMIHUD'].map(h => (
+                    <th key={h} style={{ padding: '8px 10px', textAlign: 'right', fontSize: 9, color: '#e8e8ec', background: '#0a0a0b', borderBottom: '1px solid #2a2a30', fontWeight: 700 }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>

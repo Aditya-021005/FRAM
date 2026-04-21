@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, LineChart, Line } from 'recharts';
-import { RETURNS_DATA } from '../data';
+
 
 const C = { amber: '#f5a623', green: '#39d98a', red: '#ff4d4d', blue: '#5b8dee', muted: '#6b6b78', cyan: '#22d3ee', pink: '#f472b6' };
 
@@ -31,7 +31,7 @@ const Label = ({ children }) => (
 const axisProps = { tick: { fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }, axisLine: false, tickLine: false };
 const legendStyle = { fontSize: 9, fontFamily: 'IBM Plex Mono, monospace' };
 
-export default function PartB({ illiquid, liquid }) {
+export default function PartB({ illiquid, liquid, returnsData }) {
 
   const getRow1Data = (stock) => {
     const labels = ['ATM', 'OTM_Call', 'OTM_Put'];
@@ -65,7 +65,7 @@ export default function PartB({ illiquid, liquid }) {
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 9, color: C.amber, letterSpacing: '0.14em', marginBottom: 8 }}>PART B · OPTION PRICING</div>
         <h2 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', color: '#e8e8ec', marginBottom: 6 }}>Ground Truth Analytics</h2>
-        <p style={{ fontSize: 11, color: '#6b6b78', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 11, color: '#e8e8ec', lineHeight: 1.7 }}>
           Comparing BSM benchmarks against GARCH conditional volatilities and market premiums across strike types and tenors.
         </p>
       </div>
@@ -137,7 +137,7 @@ export default function PartB({ illiquid, liquid }) {
       <Label>GARCH(1,1) CONDITIONAL VOLATILITY PATH</Label>
       <ChartBox title="ANNUALIZED CONDITIONAL VOLATILITY %" style={{ marginBottom: 20 }}>
         <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={RETURNS_DATA}>
+          <LineChart data={returnsData}>
             <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
             <XAxis dataKey="date" {...axisProps} interval={20} />
             <YAxis {...axisProps} unit="%" />

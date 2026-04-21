@@ -2,7 +2,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, Legend, Cell, AreaChart, Area, ComposedChart, ReferenceLine
 } from 'recharts';
-import { HISTOGRAM_DATA, RETURNS_DATA } from '../data';
+
 
 const C = { amber: '#f5a623', green: '#39d98a', red: '#ff4d4d', blue: '#5b8dee', muted: '#6b6b78' };
 
@@ -34,7 +34,7 @@ const Label = ({ children }) => (
 const axisProps = { tick: { fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }, axisLine: false, tickLine: false };
 const legendStyle = { fontSize: 9, fontFamily: 'IBM Plex Mono, monospace' };
 
-export default function PartD({ illiquid, liquid }) {
+export default function PartD({ illiquid, liquid, returnsData, histogramData }) {
 
   const getRegimeData = (stock) => {
     const regimes = ['Full Period', 'Normal', 'High-Vol'];
@@ -59,7 +59,7 @@ export default function PartD({ illiquid, liquid }) {
   const HistView = ({ dataKey, ticker, var95, var99, color }) => (
     <ChartBox title={`RETURN DISTRIBUTION — ${ticker}`}>
       <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={HISTOGRAM_DATA}>
+        <ComposedChart data={histogramData}>
           <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
           <XAxis dataKey="bi" {...axisProps} label={{ value: 'Daily Log Return (%)', position: 'bottom', fontSize: 9, fill: C.muted, offset: 0 }} />
           <YAxis {...axisProps} label={{ value: 'Density', angle: -90, position: 'insideLeft', fontSize: 8, fill: C.muted }} />
@@ -84,7 +84,7 @@ export default function PartD({ illiquid, liquid }) {
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 9, color: C.amber, letterSpacing: '0.14em', marginBottom: 8 }}>PART D · VALUE AT RISK & STRESS ANALYSIS</div>
         <h2 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', color: '#e8e8ec', marginBottom: 6 }}>Risk Management</h2>
-        <p style={{ fontSize: 11, color: '#6b6b78', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 11, color: '#e8e8ec', lineHeight: 1.7 }}>
           Stressed risk assessment comparing parametric methods with conditional volatility and Monte Carlo simulations.
         </p>
       </div>
@@ -92,8 +92,20 @@ export default function PartD({ illiquid, liquid }) {
       {/* return distributions */}
       <Label>RETURN DISTRIBUTION WITH VaR CUTOFFS</Label>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-        <HistView dataKey="hdfc"   ticker={liquid.ticker}   var95={2.47} var99={3.37} color={C.blue} />
-        <HistView dataKey="nestle" ticker={illiquid.ticker} var95={1.80} var99={2.51} color={C.red}  />
+        <HistView 
+          dataKey="liqHist" 
+          ticker={liquid.ticker} 
+          var95={liquid.varAnalysis?.[0]?.varPct || 2.47} 
+          var99={liquid.varAnalysis?.[1]?.varPct || 3.37} 
+          color={C.blue} 
+        />
+        <HistView 
+          dataKey="illiqHist" 
+          ticker={illiquid.ticker} 
+          var95={illiquid.varAnalysis?.[0]?.varPct || 1.80} 
+          var99={illiquid.varAnalysis?.[1]?.varPct || 2.51} 
+          color={C.red} 
+        />
       </div>
 
       {/* regime VaR */}
@@ -138,14 +150,14 @@ export default function PartD({ illiquid, liquid }) {
       <Label>ROLLING 20-DAY PARAMETRIC VaR (99%)</Label>
       <ChartBox title="FULL PERIOD — SHADED AREAS = HIGH-VOL REGIME CLUSTERS" style={{ marginBottom: 24 }}>
         <ResponsiveContainer width="100%" height={240}>
-          <AreaChart data={RETURNS_DATA}>
+          <AreaChart data={returnsData}>
             <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
             <XAxis dataKey="date" {...axisProps} />
             <YAxis {...axisProps} />
             <Tooltip content={<TTip />} />
             <Legend wrapperStyle={legendStyle} />
-            <Area type="monotone" dataKey="hdfcVaR"       name={`${liquid.ticker} VaR 99%`}   stroke={C.blue} fill={C.blue} fillOpacity={0.12} />
-            <Area type="monotone" dataKey="nestleVaR"     name={`${illiquid.ticker} VaR 99%`} stroke={C.red}  fill={C.red}  fillOpacity={0.12} />
+            <Area type="monotone" dataKey="liqVaR"   name={`${liquid.ticker} VaR 99%`}   stroke={C.blue} fill={C.blue} fillOpacity={0.12} />
+            <Area type="monotone" dataKey="illiqVaR" name={`${illiquid.ticker} VaR 99%`} stroke={C.red}  fill={C.red}  fillOpacity={0.12} />
             <Area dataKey="isHighVolLiq"   fill={C.blue} fillOpacity={0.05} stroke="none" />
             <Area dataKey="isHighVolIlliq" fill={C.red}  fillOpacity={0.05} stroke="none" />
           </AreaChart>
