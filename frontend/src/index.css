@@ -32,9 +32,19 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: v
 .app { min-height: 100vh; }
 
 /* Landing */
-.landing { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; background: var(--bg-secondary); }
-.landing h1 { font-size: 56px; font-weight: 700; letter-spacing: -0.05em; margin-bottom: 16px; }
-.landing p { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin-bottom: 40px; line-height: 1.6; }
+.landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding: 80px 24px;
+  background: var(--bg-secondary);
+}
+
+.landing h1 { font-size: 48px; font-weight: 700; letter-spacing: -0.05em; margin-bottom: 16px; }
+.landing p { font-size: 16px; color: var(--text-secondary); max-width: 650px; margin-bottom: 48px; line-height: 1.6; }
 
 .btn-primary { padding: 12px 32px; background: var(--accent); color: var(--accent-fg); border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer; font-size: 15px; transition: scale 0.1s; }
 .btn-primary:active { scale: 0.98; }
@@ -56,6 +66,13 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: v
 .section-subtitle { font-size: 15px; color: var(--text-secondary); max-width: 700px; }
 
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.grid-3 { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px; 
+  width: 100%; 
+  max-width: 1000px;
+}
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 
 .card { border: 1px solid var(--border); background: var(--bg-card); padding: 28px; border-radius: var(--radius); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }

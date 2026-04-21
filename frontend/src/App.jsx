@@ -31,7 +31,7 @@ function App() {
            Greeks sensitivity, and regime-based risk exposure.
         </p>
 
-        <div className="grid-3" style={{ maxWidth: '900px', width: '100%', marginBottom: '48px', textAlign: 'left' }}>
+        <div className="grid-3" style={{ marginBottom: '48px', textAlign: 'left' }}>
           <div className="card" style={{ padding: '20px' }}>
             <FiTrendingUp style={{ marginBottom: '12px' }} size={24} />
             <h3 style={{ fontSize: '14px', marginBottom: '8px' }}>Liquidity Dynamics</h3>
