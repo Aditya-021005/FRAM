@@ -14,9 +14,9 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const barColors = (category) => {
-  if (category === 'LIQUID') return '#09090b';
-  if (category === 'ILLIQUID') return '#71717a';
-  return '#e4e4e7';
+  if (category === 'LIQUID') return 'var(--chart-1)';
+  if (category === 'ILLIQUID') return 'var(--chart-2)';
+  return 'var(--chart-3)';
 };
 
 export default function PartA({ illiquid }) {
@@ -82,8 +82,8 @@ export default function PartA({ illiquid }) {
               <XAxis dataKey="date" hide />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="liqReturn" name="Liquid" stroke="#09090b" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="illiqReturn" name="Illiquid" stroke="#a1a1aa" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="liqReturn" name="Liquid" stroke="var(--chart-1)" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="illiqReturn" name="Illiquid" stroke="var(--chart-2)" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -95,8 +95,8 @@ export default function PartA({ illiquid }) {
               <XAxis dataKey="date" hide />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="liqVol" name="Liquid Vol" stroke="#09090b" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="illiqVol" name="Illiquid Vol" stroke="#a1a1aa" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="liqVol" name="Liquid Vol" stroke="var(--chart-1)" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="illiqVol" name="Illiquid Vol" stroke="var(--chart-2)" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>

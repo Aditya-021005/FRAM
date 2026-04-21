@@ -41,9 +41,9 @@ export default function PartB({ illiquid }) {
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="top" height={36} />
-              <Bar dataKey="BSM Hist" fill="#e4e4e7" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="Market" fill="#71717a" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="GARCH" fill="#09090b" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="BSM Hist" fill="var(--chart-3)" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="Market" fill="var(--chart-2)" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="GARCH" fill="var(--chart-1)" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -56,9 +56,9 @@ export default function PartB({ illiquid }) {
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="top" height={36} />
-              <Bar dataKey="BSM Hist" fill="#e4e4e7" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="Market" fill="#71717a" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="GARCH" fill="#09090b" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="BSM Hist" fill="var(--chart-3)" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="Market" fill="var(--chart-2)" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="GARCH" fill="var(--chart-1)" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

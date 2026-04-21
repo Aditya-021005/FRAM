@@ -13,6 +13,10 @@
   --accent: #18181b;
   --accent-fg: #ffffff;
   --radius: 8px;
+  --chart-1: #09090b;
+  --chart-2: #71717a;
+  --chart-3: #e4e4e7;
+  --chart-grid: #e4e4e7;
 }
 
 .dark {
@@ -25,6 +29,10 @@
   --text-secondary: #a1a1aa;
   --accent: #ffffff;
   --accent-fg: #09090b;
+  --chart-1: #ffffff;
+  --chart-2: #a1a1aa;
+  --chart-3: #27272a;
+  --chart-grid: #27272a;
 }
 
 body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); transition: background 0.2s; -webkit-font-smoothing: antialiased; }
@@ -136,12 +144,20 @@ tr:hover td { background: var(--bg-secondary); }
   transition: all 0.2s ease;
 }
 
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
 .btn-primary:active {
   transform: translateY(0);
+}
+
+.btn-primary:hover {
+  background: var(--text-secondary);
+  color: var(--bg-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-outline:hover {
+  background: var(--bg-muted);
+  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 

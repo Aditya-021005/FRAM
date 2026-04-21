@@ -17,7 +17,7 @@ export default function PartD({ illiquid }) {
               <XAxis dataKey="regime" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip cursor={{ fill: 'var(--bg-muted)' }} />
-              <Bar dataKey="varPct" name="VaR %" fill="#09090b" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="varPct" name="VaR %" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
