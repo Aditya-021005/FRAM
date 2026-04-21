@@ -5,7 +5,7 @@ export default function PartC({ illiquid }) {
   const mockPremium = illiquid.ticker.includes('NESTLE') ? 42150 : 32870;
 
   return (
-    <div className="fade-in">
+    <div className="slide-up fade-in">
       <div className="section-header">
         <h2 className="section-title">Greeks & Portfolio Hedging</h2>
         <p className="section-subtitle">Analysis for {illiquid.ticker}.</p>

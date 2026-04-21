@@ -31,7 +31,7 @@ export default function PartA({ illiquid }) {
   const liq = LIQUID_DATA;
 
   return (
-    <div className="fade-in">
+    <div className="slide-up fade-in">
       <div className="section-header">
         <h2 className="section-title">Stock Selection & Liquidity</h2>
         <p className="section-subtitle">NIFTY 50 ranking by turnover. Comparing {liq.ticker} (Liquid) vs {illiquid.ticker} (Illiquid).</p>

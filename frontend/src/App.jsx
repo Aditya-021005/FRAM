@@ -21,17 +21,17 @@ function App() {
 
   if (isLanding) {
     return (
-      <div className="landing">
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--bg-muted)', padding: '6px 14px', borderRadius: '100px', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '32px', border: '1px solid var(--border)' }}>
+      <div className="landing fade-in">
+        <div className="slide-up" style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--bg-muted)', padding: '6px 14px', borderRadius: '100px', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '32px', border: '1px solid var(--border)' }}>
           <FiActivity size={14} /> FIN F414 CORPORATE PROJECT
         </div>
-        <h1 style={{ maxWidth: '900px', marginBottom: '24px' }}>{PROJECT_INFO.title}</h1>
-        <p style={{ marginBottom: '48px' }}>
+        <h1 className="slide-up" style={{ maxWidth: '900px', marginBottom: '24px' }}>{PROJECT_INFO.title}</h1>
+        <p className="slide-up" style={{ marginBottom: '48px' }}>
           An institutional-grade analysis platform measuring the impact of liquidity on option pricing, 
            Greeks sensitivity, and regime-based risk exposure.
         </p>
 
-        <div className="grid-3" style={{ marginBottom: '48px', textAlign: 'left' }}>
+        <div className="grid-3 slide-up" style={{ marginBottom: '48px', textAlign: 'left' }}>
           <div className="card" style={{ padding: '20px' }}>
             <FiTrendingUp style={{ marginBottom: '12px' }} size={24} />
             <h3 style={{ fontSize: '14px', marginBottom: '8px' }}>Liquidity Dynamics</h3>
@@ -49,7 +49,7 @@ function App() {
           </div>
         </div>
 
-        <div className="card" style={{ padding: '32px', maxWidth: '500px', width: '100%', border: '2px solid var(--accent)' }}>
+        <div className="card scale-in" style={{ padding: '32px', maxWidth: '500px', width: '100%', border: '2px solid var(--accent)' }}>
           <label style={{ fontSize: '12px', fontWeight: 700, display: 'block', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Select Illiquid Security
           </label>

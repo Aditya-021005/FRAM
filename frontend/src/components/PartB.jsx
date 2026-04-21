@@ -25,7 +25,7 @@ export default function PartB({ illiquid }) {
   }));
 
   return (
-    <div className="fade-in">
+    <div className="slide-up fade-in">
       <div className="section-header">
         <h2 className="section-title">Option Pricing & Volatility</h2>
         <p className="section-subtitle">BSM pricing vs Market prices. {LIQUID_DATA.ticker} vs {illiquid.ticker}.</p>

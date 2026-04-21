@@ -101,3 +101,47 @@ tr:hover td { background: var(--bg-secondary); }
 .insight-box { background: var(--bg-secondary); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin-top: 32px; border-left: 4px solid var(--accent); }
 .insight-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 .insight-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+/* Animations */
+.fade-in { animation: fadeIn 0.5s ease-out; }
+.slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.scale-in { animation: scaleIn 0.4s ease-out; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.card, .stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover, .stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -10px rgba(0,0,0,0.1);
+  border-color: var(--accent);
+}
+
+.btn-primary, .btn-outline, .nav-tab {
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+

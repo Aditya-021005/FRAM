@@ -2,7 +2,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 
 export default function PartD({ illiquid }) {
   return (
-    <div className="fade-in">
+    <div className="slide-up fade-in">
       <div className="section-header">
         <h2 className="section-title">Value at Risk (VaR) Analysis</h2>
         <p className="section-subtitle">Comparing risk across regimes for {illiquid.ticker}.</p>
