@@ -47,7 +47,13 @@ export default function PartD({ illiquid, liquid }) {
       </div>
 
       <div className="table-container">
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>Risk Summary Matrix (All Securities)</div>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          Risk Summary Matrix (All Securities)
+          <div style={{ display: 'flex', gap: '8px', fontSize: '12px', fontWeight: 400, color: 'var(--text-secondary)' }}>
+            <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>L</span> Liquid
+            <span style={{ background: 'var(--bg-muted)', color: 'var(--text-primary)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', fontWeight: 600 }}>I</span> Illiquid
+          </div>
+        </div>
         <table>
           <thead>
             <tr>
@@ -58,12 +64,33 @@ export default function PartD({ illiquid, liquid }) {
             </tr>
           </thead>
           <tbody>
+            <tr style={{ borderLeft: '3px solid var(--accent)', background: 'var(--bg-muted)' }}>
+              <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px' }}>L</span>
+                {liquid.ticker}
+              </td>
+              <td>{liquid.var[0].varPct.toFixed(2)}%</td>
+              <td>{liquid.var[1].varPct.toFixed(2)}%</td>
+              <td>₹{liquid.var[0].varRs.toLocaleString()}</td>
+            </tr>
+            <tr style={{ borderLeft: '3px solid var(--text-secondary)', background: 'var(--bg-muted)', borderBottom: '2px solid var(--border)' }}>
+              <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>
+                {illiquid.ticker}
+              </td>
+              <td>{illiquid.var[0].varPct.toFixed(2)}%</td>
+              <td>{illiquid.var[1].varPct.toFixed(2)}%</td>
+              <td>₹{illiquid.var[0].varRs.toLocaleString()}</td>
+            </tr>
             {liqStocks.map(s => {
+              if (s.ticker === liquid.ticker) return null;
               const data = getLiquidData(s.ticker);
-              const isSelected = s.ticker === liquid.ticker;
               return (
                 <tr key={s.ticker}>
-                  <td>{s.ticker} {isSelected && <span className="tag">Selected</span>}</td>
+                  <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, width: '18px', textAlign: 'center' }}>L</span>
+                    {s.ticker}
+                  </td>
                   <td>{data.var[0].varPct.toFixed(2)}%</td>
                   <td>{data.var[1].varPct.toFixed(2)}%</td>
                   <td>₹{data.var[0].varRs.toLocaleString()}</td>
@@ -71,11 +98,14 @@ export default function PartD({ illiquid, liquid }) {
               );
             })}
             {illiquidStocks.map(s => {
+              if (s.ticker === illiquid.ticker) return null;
               const data = getIlliquidData(s.ticker);
-              const isSelected = s.ticker === illiquid.ticker;
               return (
                 <tr key={s.ticker}>
-                  <td>{s.ticker} {isSelected && " (Selected)"}</td>
+                  <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, width: '18px', textAlign: 'center' }}>I</span>
+                    {s.ticker}
+                  </td>
                   <td>{data.var[0].varPct.toFixed(2)}%</td>
                   <td>{data.var[1].varPct.toFixed(2)}%</td>
                   <td>₹{data.var[0].varRs.toLocaleString()}</td>
