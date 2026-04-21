@@ -28,7 +28,7 @@ export default function PartA({ illiquid, liquid }) {
     category: d.category,
   }));
 
-  const liq = liquid;
+
 
   return (
     <div className="slide-up fade-in">
@@ -40,19 +40,19 @@ export default function PartA({ illiquid, liquid }) {
       <div className="grid-4" style={{ marginBottom: 32 }}>
         <div className="stat-card">
           <div className="stat-label">Liquid Security</div>
-          <div className="stat-value">{liq.ticker.replace('.NS', '')}</div>
+          <div className="stat-value">{liquid.ticker.replace('.NS', '')}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Selected Illiquid</div>
+          <div className="stat-label">Illiquid Security</div>
           <div className="stat-value">{illiquid.ticker.replace('.NS', '')}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Turnover Ratio (L)</div>
-          <div className="stat-value">0.0012</div>
+          <div className="stat-label">Turnover Ratio (I/L)</div>
+          <div className="stat-value">{(illiquid.stats.avgTurnover / liquid.stats.avgTurnover).toFixed(4)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Slippage Beta</div>
-          <div className="stat-value">{ (illiquid.stats.avgAmihud / liq.stats.avgAmihud).toFixed(1) }x</div>
+          <div className="stat-value">{(illiquid.stats.avgAmihud / liquid.stats.avgAmihud).toFixed(1)}x</div>
         </div>
       </div>
 
