@@ -67,7 +67,7 @@ export default function PartD({ illiquid }) {
               const data = getIlliquidData(s.ticker);
               const isSelected = s.ticker === illiquid.ticker;
               return (
-                <tr key={s.ticker} style={isSelected ? { background: 'var(--accent)', color: 'var(--accent-fg)' } : {}}>
+                <tr key={s.ticker}>
                   <td>{s.ticker} {isSelected && " (Selected)"}</td>
                   <td>{data.var[0].varPct.toFixed(2)}%</td>
                   <td>{data.var[1].varPct.toFixed(2)}%</td>

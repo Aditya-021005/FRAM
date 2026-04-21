@@ -89,7 +89,7 @@ export default function PartB({ illiquid }) {
               const data = getIlliquidData(s.ticker);
               const isSelected = s.ticker === illiquid.ticker;
               return (
-                <tr key={s.ticker} style={isSelected ? { background: 'var(--accent)', color: 'var(--accent-fg)' } : {}}>
+                <tr key={s.ticker}>
                   <td>{s.ticker} {isSelected && " (Selected)"}</td>
                   <td>{data.vol.histVol}%</td>
                   <td>{data.vol.garchVol.toFixed(2)}%</td>

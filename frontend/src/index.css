@@ -96,7 +96,7 @@ table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: lef
 th { background: var(--bg-secondary); padding: 14px 20px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
 td { padding: 14px 20px; border-bottom: 1px solid var(--border); color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--bg-secondary); }
+tr:hover td { background: var(--bg-muted); cursor: pointer; }
 
 .tag { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid var(--border); background: var(--bg-muted); color: var(--text-primary); }
 .tag.illiquid { background: var(--accent); color: var(--accent-fg); border: none; }
@@ -149,15 +149,15 @@ tr:hover td { background: var(--bg-secondary); }
 }
 
 .btn-primary:hover {
-  background: var(--text-secondary);
-  color: var(--bg-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background: var(--accent);
+  color: var(--accent-fg);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 .btn-outline:hover {
-  background: var(--bg-muted);
-  border-color: var(--accent);
-  transform: translateY(-2px);
+  background: var(--accent);
+  color: var(--accent-fg);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
-

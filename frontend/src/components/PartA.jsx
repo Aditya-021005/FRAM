@@ -127,7 +127,7 @@ export default function PartA({ illiquid }) {
               const data = getIlliquidData(s.ticker);
               const isSelected = s.ticker === illiquid.ticker;
               return (
-                <tr key={s.ticker} style={isSelected ? { background: 'var(--accent)', color: 'var(--accent-fg)' } : {}}>
+                <tr key={s.ticker}>
                   <td style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     {s.ticker} 
                     {isSelected && <span className="tag" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', border: 'none', padding: '2px 8px' }}>Selected</span>}

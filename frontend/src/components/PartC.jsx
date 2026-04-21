@@ -51,7 +51,7 @@ export default function PartC({ illiquid }) {
               const data = getIlliquidData(s.ticker);
               const isSelected = s.ticker === illiquid.ticker;
               return (
-                <tr key={s.ticker} style={isSelected ? { background: 'var(--accent)', color: 'var(--accent-fg)' } : {}}>
+                <tr key={s.ticker}>
                   <td>{s.ticker} {isSelected && " (Selected)"}</td>
                   <td><span style={{ color: isSelected ? 'inherit' : '#dc2626' }}>₹{data.pnl[0].totalPnl.toFixed(0)}</span></td>
                   <td><span style={{ color: isSelected ? 'inherit' : '#16a34a' }}>₹{data.pnl[1].totalPnl.toFixed(0)}</span></td>
