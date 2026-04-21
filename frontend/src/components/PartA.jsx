@@ -30,6 +30,44 @@ export default function PartA({ illiquid, liquid }) {
 
 
 
+  const renderCorrelationMatrix = (s, title) => (
+    <div className="card" style={{ padding: '20px' }}>
+      <div className="card-header" style={{ marginBottom: '16px' }}>
+        <span className="card-title" style={{ fontSize: '13px' }}>Correlation Matrix — {title}</span>
+      </div>
+      <table className="mini-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Vol</th>
+            <th>Amihud</th>
+            <th>Turnover Ratio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style={{ fontWeight: 600 }}>Vol</td>
+            <td>1.0000</td>
+            <td>{s.correlation?.vol_amihud.toFixed(4) || '0.0000'}</td>
+            <td>{s.correlation?.vol_turnover.toFixed(4) || '0.0000'}</td>
+          </tr>
+          <tr>
+            <td style={{ fontWeight: 600 }}>Amihud</td>
+            <td>{s.correlation?.vol_amihud.toFixed(4) || '0.0000'}</td>
+            <td>1.0000</td>
+            <td>{s.correlation?.amihud_turnover.toFixed(4) || '0.0000'}</td>
+          </tr>
+          <tr>
+            <td style={{ fontWeight: 600 }}>Turnover Ratio</td>
+            <td>{s.correlation?.vol_turnover.toFixed(4) || '0.0000'}</td>
+            <td>{s.correlation?.amihud_turnover.toFixed(4) || '0.0000'}</td>
+            <td>1.0000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
     <div className="slide-up fade-in">
       <div className="section-header">
@@ -248,6 +286,10 @@ export default function PartA({ illiquid, liquid }) {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="grid-2" style={{ marginTop: 32, gap: '24px' }}>
+        {renderCorrelationMatrix(liquid, `${liquid.ticker} (Liquid)`)}
+        {renderCorrelationMatrix(illiquid, `${illiquid.ticker} (Illiquid)`)}
       </div>
     </div>
   );

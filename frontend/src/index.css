@@ -140,6 +140,13 @@ tr:hover td { background: var(--bg-muted); }
 .insight-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 .insight-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
 
+.mini-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.mini-table th { padding: 8px; background: transparent; color: var(--text-secondary); border-bottom: 2px solid var(--border); text-transform: none; letter-spacing: 0; text-align: right; }
+.mini-table th:first-child { text-align: left; }
+.mini-table td { padding: 8px; border-bottom: 1px solid var(--border); text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.mini-table td:first-child { text-align: left; background: var(--bg-secondary); font-weight: 600; color: var(--text-secondary); }
+.mini-table tr:hover td { background: var(--bg-muted); }
+
 /* Animations */
 .fade-in { animation: fadeIn 0.5s ease-out; }
 .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }

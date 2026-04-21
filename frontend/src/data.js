@@ -31,33 +31,44 @@ export const NIFTY50_RANKING = [
 export const LIQUID_DATA = {
   ticker: "HDFCBANK.NS",
   rank: 1,
-  stats: { meanReturn: 0.0412, stdReturn: 1.2834, minReturn: -3.87, maxReturn: 4.21, avgTurnover: 2847.31, avgAmihud: 0.0342, avgRollingVol: 18.45 },
-  vol: { histVol: 18.45, garchVol: 20.87, longRunVol: 17.23, persistence: 0.9634 },
+  stats: { meanReturn: -0.2401, stdReturn: 1.5375, minReturn: -5.4667, maxReturn: 5.5552, avgTurnover: 3034.01, avgAmihud: 0.0004, avgRollingVol: 18.82 },
+  vol: { histVol: 18.82, garchVol: 20.15, longRunVol: 18.10, persistence: 0.9634 },
+  correlation: { 
+    vol_amihud: 0.2379, 
+    vol_turnover: 0.5752, 
+    amihud_turnover: 0.1052 
+  },
   options: [
-    { strikeLabel: "ATM", optType: "Call", spot: 1842.5, strike: 1840, histVol: 18.45, mktPrice: 52.38, bsmHist: 49.12, dev: 6.63, bsmGarch: 51.87, dte: 29 },
-    { strikeLabel: "OTM_Call", optType: "Call", spot: 1842.5, strike: 1970, histVol: 18.45, mktPrice: 12.45, bsmHist: 11.23, dev: 10.86, bsmGarch: 13.56, dte: 29 },
+    { strikeLabel: "ATM", optType: "Call", spot: 1842.5, strike: 1840, histVol: 18.82, mktPrice: 52.38, bsmHist: 49.12, dev: 6.63, bsmGarch: 51.87, dte: 29, delta: 0.52, gamma: 0.0025, vega: 1.2 },
+    { strikeLabel: "OTM_Call", optType: "Call", spot: 1842.5, strike: 1970, histVol: 18.82, mktPrice: 12.45, bsmHist: 11.23, dev: 10.86, bsmGarch: 13.56, dte: 29, delta: 0.15, gamma: 0.0008, vega: 0.4 },
   ]
 };
 
 // Function to generate consistent data for any illiquid stock
 export const getIlliquidData = (ticker) => {
   const stock = NIFTY50_RANKING.find(s => s.ticker === ticker);
-  const baseVol = 25 + (50 - stock.rank) * 1.5;
-  const turnover = stock.turnover;
+  const isNestle = ticker === 'NESTLEIND.NS';
+  const baseVol = isNestle ? 16.57 : (25 + (50 - stock.rank) * 1.5);
+  const turnover = isNestle ? 138.58 : stock.turnover;
   
   return {
     ticker: stock.ticker,
     rank: stock.rank,
     stats: { 
-      meanReturn: 0.03 + (Math.random() - 0.5) * 0.01, 
-      stdReturn: baseVol / 15, 
-      minReturn: -baseVol / 5, 
-      maxReturn: baseVol / 5.5, 
+      meanReturn: isNestle ? 0.0111 : (0.03 + (Math.random() - 0.5) * 0.01), 
+      stdReturn: isNestle ? 1.1604 : (baseVol / 15), 
+      minReturn: isNestle ? -2.7249 : (-baseVol / 5), 
+      maxReturn: isNestle ? 3.3969 : (baseVol / 5.5), 
       avgTurnover: turnover, 
-      avgAmihud: (100 / turnover) * 2.5, 
+      avgAmihud: isNestle ? 0.0070 : ((100 / turnover) * 2.5), 
       avgRollingVol: baseVol 
     },
     vol: { histVol: baseVol, garchVol: baseVol * 1.12, longRunVol: baseVol * 0.95, persistence: 0.95 + (Math.random() * 0.03) },
+    correlation: { 
+      vol_amihud: isNestle ? 0.1763 : 0.20, 
+      vol_turnover: isNestle ? 0.2342 : 0.30, 
+      amihud_turnover: isNestle ? -0.1513 : -0.10 
+    },
     options: [
       { strikeLabel: "ATM", optType: "Call", spot: 1000, strike: 1000, histVol: baseVol, mktPrice: baseVol * 3.2, bsmHist: baseVol * 2.8, dev: 15.4, bsmGarch: baseVol * 3.5, dte: 29, delta: 0.48, gamma: 0.003, vega: 1.4 },
       { strikeLabel: "OTM_Call", optType: "Call", spot: 1000, strike: 1100, histVol: baseVol, mktPrice: baseVol * 0.9, bsmHist: baseVol * 0.7, dev: 25.8, bsmGarch: baseVol * 1.1, dte: 29, delta: 0.12, gamma: 0.001, vega: 0.5 },
@@ -92,6 +103,11 @@ export const getLiquidData = (ticker) => {
       garchVol: parseFloat((baseVol * 1.1).toFixed(2)),
       longRunVol: parseFloat((baseVol * 0.94).toFixed(2)),
       persistence: parseFloat((0.95 + stock.rank * 0.002).toFixed(4)),
+    },
+    correlation: { 
+      vol_amihud: parseFloat((0.15 + Math.random() * 0.1).toFixed(4)), 
+      vol_turnover: parseFloat((0.45 + Math.random() * 0.1).toFixed(4)), 
+      amihud_turnover: parseFloat((0.05 + Math.random() * 0.05).toFixed(4)) 
     },
     options: [
       { strikeLabel: "ATM", optType: "Call", mktPrice: parseFloat((baseVol * 2.8).toFixed(2)), bsmHist: parseFloat((baseVol * 2.6).toFixed(2)), bsmGarch: parseFloat((baseVol * 2.9).toFixed(2)), dte: 29, delta: 0.52, gamma: 0.0025, vega: 1.2 },
