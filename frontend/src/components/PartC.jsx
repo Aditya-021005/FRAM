@@ -15,11 +15,9 @@ export default function PartC({ illiquid, liquid }) {
   const IBadge = () => <span style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>;
   const SMBadge = ({ type }) => <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, width: '18px', textAlign: 'center' }}>{type}</span>;
 
-  // Determine strategy based on stock category
-  const isLiqSelected = liquid.category === 'LIQUID'; // Assuming we show Liquid side if needed, but let's focus on the 'Selected' logic
+  const pinStyle = (left) => ({ borderLeft: `3px solid ${left ? 'var(--accent)' : 'var(--text-secondary)'}`, background: 'var(--bg-muted)' });
+
   // For the main card, let's show the Illiquid strategy as per previous layout, or make it dynamic if the user selects.
-  // The user's request suggests they want the math to be right.
-  
   const getStrategy = (s) => s.rank <= 12 ? {
     name: 'Calendar Bull Call Spread',
     legs: 'Long 2× ATM Call (30d) + Short 1× OTM Call (60d)',
