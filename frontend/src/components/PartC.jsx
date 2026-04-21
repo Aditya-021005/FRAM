@@ -1,6 +1,6 @@
 import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData } from '../data';
 
-export default function PartC({ illiquid }) {
+export default function PartC({ illiquid, liquid }) {
   const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
   const mockPremium = illiquid.ticker.includes('NESTLE') ? 42150 : 32870;
 

@@ -1,10 +1,10 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
-import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData } from '../data';
+import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData, getLiquidData } from '../data';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12, boxShadow: 'var(--shadow-sm)' }}>
+    <div style={{ background: 'var(--tooltip-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12, boxShadow: 'var(--shadow-sm)' }}>
       <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}</p>
@@ -13,7 +13,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-export default function PartD({ illiquid }) {
+export default function PartD({ illiquid, liquid }) {
+  const liqStocks = NIFTY50_RANKING.filter(s => s.category === 'LIQUID');
   const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
 
   return (
@@ -57,12 +58,18 @@ export default function PartD({ illiquid }) {
             </tr>
           </thead>
           <tbody>
-            <tr style={{ background: 'var(--bg-secondary)', fontWeight: 600 }}>
-              <td>{LIQUID_DATA.ticker} <span className="tag">Liquid</span></td>
-              <td>2.95%</td>
-              <td>4.39%</td>
-              <td>₹29,500</td>
-            </tr>
+            {liqStocks.map(s => {
+              const data = getLiquidData(s.ticker);
+              const isSelected = s.ticker === liquid.ticker;
+              return (
+                <tr key={s.ticker}>
+                  <td>{s.ticker} {isSelected && <span className="tag">Selected</span>}</td>
+                  <td>{data.var[0].varPct.toFixed(2)}%</td>
+                  <td>{data.var[1].varPct.toFixed(2)}%</td>
+                  <td>₹{data.var[0].varRs.toLocaleString()}</td>
+                </tr>
+              );
+            })}
             {illiquidStocks.map(s => {
               const data = getIlliquidData(s.ticker);
               const isSelected = s.ticker === illiquid.ticker;

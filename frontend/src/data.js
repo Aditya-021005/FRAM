@@ -64,12 +64,46 @@ export const getIlliquidData = (ticker) => {
       { priceShock: "-2%", volShock: "-20%", totalPnl: -800 - baseVol * 10 },
       { priceShock: "+2%", volShock: "+20%", totalPnl: 900 + baseVol * 8 },
     ],
-    var: [
-      { regime: "Full Period", conf: "99%", varPct: baseVol / 6, varRs: (baseVol / 6) * 10000 },
+    var: [     { regime: "Full Period", conf: "99%", varPct: baseVol / 6, varRs: (baseVol / 6) * 10000 },
       { regime: "High-Vol", conf: "99%", varPct: baseVol / 4, varRs: (baseVol / 4) * 10000 },
     ]
   };
 };
+
+export const getLiquidData = (ticker) => {
+  const stock = NIFTY50_RANKING.find(s => s.ticker === ticker);
+  const baseVol = 12 + (8 - stock.rank) * 1.2;
+  const turnover = stock.turnover;
+  return {
+    ticker: stock.ticker,
+    stats: {
+      meanReturn: parseFloat((0.04 + stock.rank * 0.002).toFixed(4)),
+      stdReturn: parseFloat((baseVol / 14).toFixed(4)),
+      avgTurnover: turnover,
+      avgAmihud: parseFloat(((10 / turnover) * 0.5).toFixed(4)),
+      avgRollingVol: parseFloat(baseVol.toFixed(2)),
+    },
+    vol: {
+      histVol: parseFloat(baseVol.toFixed(2)),
+      garchVol: parseFloat((baseVol * 1.1).toFixed(2)),
+      longRunVol: parseFloat((baseVol * 0.94).toFixed(2)),
+      persistence: parseFloat((0.95 + stock.rank * 0.002).toFixed(4)),
+    },
+    options: [
+      { strikeLabel: "ATM", optType: "Call", mktPrice: parseFloat((baseVol * 2.8).toFixed(2)), bsmHist: parseFloat((baseVol * 2.6).toFixed(2)), bsmGarch: parseFloat((baseVol * 2.9).toFixed(2)), dte: 29 },
+      { strikeLabel: "OTM_Call", optType: "Call", mktPrice: parseFloat((baseVol * 0.7).toFixed(2)), bsmHist: parseFloat((baseVol * 0.6).toFixed(2)), bsmGarch: parseFloat((baseVol * 0.8).toFixed(2)), dte: 29 },
+    ],
+    pnl: [
+      { priceShock: "-2%", volShock: "-20%", totalPnl: parseFloat((-400 - baseVol * 8).toFixed(1)) },
+      { priceShock: "+2%", volShock: "+20%", totalPnl: parseFloat((500 + baseVol * 7).toFixed(1)) },
+    ],
+    var: [
+      { regime: "Full Period", conf: "99%", varPct: parseFloat((baseVol / 8).toFixed(2)), varRs: Math.round((baseVol / 8) * 10000) },
+      { regime: "High-Vol", conf: "99%", varPct: parseFloat((baseVol / 5).toFixed(2)), varRs: Math.round((baseVol / 5) * 10000) },
+    ]
+  };
+};
+
 
 export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
   const date = new Date(2025, 9, 1);

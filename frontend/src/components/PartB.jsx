@@ -1,21 +1,22 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
-import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData } from '../data';
+import { NIFTY50_RANKING, getIlliquidData, getLiquidData } from '../data';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12, boxShadow: 'var(--shadow-sm)' }}>
-      <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
+    <div style={{ background: 'var(--tooltip-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12 }}>
+      <p style={{ fontWeight: 600, marginBottom: 4, color: 'var(--tooltip-text)' }}>{label}</p>
       {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: ₹{typeof p.value === 'number' ? p.value.toFixed(2) : p.value}</p>
+        <p key={i} style={{ color: 'var(--tooltip-sub)', marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}</p>
       ))}
     </div>
   );
 };
 
-export default function PartB({ illiquid }) {
-  const liqOptions = LIQUID_DATA.options;
+export default function PartB({ illiquid, liquid }) {
+  const liqOptions = liquid.options;
   const illiqOptions = illiquid.options;
+  const liqStocks = NIFTY50_RANKING.filter(s => s.category === 'LIQUID');
   const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
 
   const makeChartData = (options) => options.map(o => ({
@@ -34,7 +35,7 @@ export default function PartB({ illiquid }) {
 
       <div className="grid-2" style={{ marginBottom: 32 }}>
         <div className="chart-container">
-          <div className="chart-title">Pricing Models — {LIQUID_DATA.ticker}</div>
+          <div className="chart-title">Pricing Models — {liquid.ticker}</div>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={makeChartData(liqOptions)}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
@@ -78,13 +79,19 @@ export default function PartB({ illiquid }) {
             </tr>
           </thead>
           <tbody>
-            <tr style={{ background: 'var(--bg-secondary)', fontWeight: 600 }}>
-              <td>{LIQUID_DATA.ticker}</td>
-              <td>{LIQUID_DATA.vol.histVol}%</td>
-              <td>{LIQUID_DATA.vol.garchVol.toFixed(2)}%</td>
-              <td>{LIQUID_DATA.vol.persistence.toFixed(4)}</td>
-              <td>{LIQUID_DATA.vol.longRunVol}%</td>
-            </tr>
+            {liqStocks.map(s => {
+              const data = getLiquidData(s.ticker);
+              const isSelected = s.ticker === liquid.ticker;
+              return (
+                <tr key={s.ticker}>
+                  <td>{s.ticker} {isSelected && <span className="tag">Selected</span>}</td>
+                  <td>{data.vol.histVol}%</td>
+                  <td>{data.vol.garchVol.toFixed(2)}%</td>
+                  <td>{data.vol.persistence.toFixed(4)}</td>
+                  <td>{data.vol.longRunVol}%</td>
+                </tr>
+              );
+            })}
             {illiquidStocks.map(s => {
               const data = getIlliquidData(s.ticker);
               const isSelected = s.ticker === illiquid.ticker;

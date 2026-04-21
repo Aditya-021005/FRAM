@@ -1,13 +1,13 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line } from 'recharts';
-import { NIFTY50_RANKING, RETURNS_DATA, LIQUID_DATA, getIlliquidData } from '../data';
+import { NIFTY50_RANKING, RETURNS_DATA, getIlliquidData, getLiquidData } from '../data';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12, boxShadow: 'var(--shadow-sm)' }}>
-      <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
+    <div style={{ background: 'var(--tooltip-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12 }}>
+      <p style={{ fontWeight: 600, marginBottom: 4, color: 'var(--tooltip-text)' }}>{label}</p>
       {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}</p>
+        <p key={i} style={{ color: 'var(--tooltip-sub)', marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}</p>
       ))}
     </div>
   );
@@ -19,23 +19,22 @@ const barColors = (category) => {
   return 'var(--chart-3)';
 };
 
-export default function PartA({ illiquid }) {
-  const top7 = NIFTY50_RANKING.slice(0, 7);
-  const bottom3 = NIFTY50_RANKING.slice(-3);
-  const chartData = [...top7, ...bottom3].map(d => ({
+export default function PartA({ illiquid, liquid }) {
+  const liqStocks = NIFTY50_RANKING.filter(s => s.category === 'LIQUID');
+  const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
+  const chartData = [...liqStocks, ...illiquidStocks.slice(-3)].map(d => ({
     name: d.ticker.replace('.NS', ''),
     turnover: d.turnover,
     category: d.category,
   }));
 
-  const liq = LIQUID_DATA;
-  const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
+  const liq = liquid;
 
   return (
     <div className="slide-up fade-in">
       <div className="section-header">
         <h2 className="section-title">Stock Selection & Liquidity</h2>
-        <p className="section-subtitle">NIFTY 50 ranking by turnover. Comparing {liq.ticker} vs {illiquid.ticker}.</p>
+        <p className="section-subtitle">NIFTY 50 ranking by turnover. Comparing <strong>{liq.ticker}</strong> (Liquid) vs <strong>{illiquid.ticker}</strong> (Illiquid).</p>
       </div>
 
       <div className="grid-4" style={{ marginBottom: 32 }}>
@@ -104,7 +103,13 @@ export default function PartA({ illiquid }) {
       </div>
 
       <div className="table-container" style={{ marginTop: 32 }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: '14px' }}>NIFTY 50 Liquidity & Risk Comparison</div>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          NIFTY 50 Liquidity & Risk Comparison
+          <div style={{ display: 'flex', gap: '8px', fontSize: '12px', fontWeight: 400, color: 'var(--text-secondary)' }}>
+            <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>L</span> Liquid Selected &nbsp;
+            <span style={{ background: 'var(--bg-muted)', color: 'var(--text-primary)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', fontWeight: 600 }}>I</span> Illiquid Selected
+          </div>
+        </div>
         <table style={{ minWidth: '800px' }}>
           <thead>
             <tr>
@@ -116,21 +121,52 @@ export default function PartA({ illiquid }) {
             </tr>
           </thead>
           <tbody>
-            <tr style={{ background: 'var(--bg-secondary)', fontWeight: 600 }}>
-              <td>{liq.ticker} <span className="tag">Liquid</span></td>
-              <td>{liq.stats.meanReturn.toFixed(4)}%</td>
-              <td>{liq.stats.stdReturn.toFixed(2)}%</td>
-              <td>₹{liq.stats.avgTurnover}</td>
-              <td>{liq.stats.avgAmihud.toFixed(4)}</td>
+            <tr style={{ background: 'var(--accent)', color: 'var(--accent-fg)' }}>
+              <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ background: 'var(--accent-fg)', color: 'var(--accent)', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px' }}>L</span>
+                {liquid.ticker}
+              </td>
+              <td>{liquid.stats.meanReturn.toFixed(4)}%</td>
+              <td>{liquid.stats.stdReturn.toFixed(2)}%</td>
+              <td>₹{liquid.stats.avgTurnover.toFixed(2)}</td>
+              <td>{liquid.stats.avgAmihud.toFixed(4)}</td>
             </tr>
+            <tr style={{ borderBottom: '2px solid var(--border)' }}>
+              <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ background: 'var(--bg-muted)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>
+                {illiquid.ticker}
+              </td>
+              <td>{illiquid.stats.meanReturn.toFixed(4)}%</td>
+              <td>{illiquid.stats.stdReturn.toFixed(2)}%</td>
+              <td>₹{illiquidStocks.find(s => s.ticker === illiquid.ticker)?.turnover.toFixed(2)}</td>
+              <td>{illiquid.stats.avgAmihud.toFixed(4)}</td>
+            </tr>
+            {liqStocks.map(s => {
+              const data = getLiquidData(s.ticker);
+              const isSelected = s.ticker === liquid.ticker;
+              if (isSelected) return null;
+              return (
+                <tr key={s.ticker}>
+                  <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, padding: '2px 7px' }}>L</span>
+                    {s.ticker}
+                  </td>
+                  <td>{data.stats.meanReturn.toFixed(4)}%</td>
+                  <td>{data.stats.stdReturn.toFixed(2)}%</td>
+                  <td>₹{s.turnover.toFixed(2)}</td>
+                  <td>{data.stats.avgAmihud.toFixed(4)}</td>
+                </tr>
+              );
+            })}
             {illiquidStocks.map(s => {
               const data = getIlliquidData(s.ticker);
               const isSelected = s.ticker === illiquid.ticker;
+              if (isSelected) return null;
               return (
                 <tr key={s.ticker}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {s.ticker} 
-                    {isSelected && <span className="tag" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', border: 'none', padding: '2px 8px' }}>Selected</span>}
+                  <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, padding: '2px 7px' }}>I</span>
+                    {s.ticker}
                   </td>
                   <td>{data.stats.meanReturn.toFixed(4)}%</td>
                   <td>{data.stats.stdReturn.toFixed(2)}%</td>

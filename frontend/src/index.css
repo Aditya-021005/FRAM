@@ -15,8 +15,11 @@
   --radius: 8px;
   --chart-1: #09090b;
   --chart-2: #71717a;
-  --chart-3: #e4e4e7;
+  --chart-3: #b0b0b8;
   --chart-grid: #e4e4e7;
+  --tooltip-bg: #ffffff;
+  --tooltip-text: #09090b;
+  --tooltip-sub: #71717a;
 }
 
 .dark {
@@ -31,8 +34,11 @@
   --accent-fg: #09090b;
   --chart-1: #ffffff;
   --chart-2: #a1a1aa;
-  --chart-3: #27272a;
+  --chart-3: #505060;
   --chart-grid: #27272a;
+  --tooltip-bg: #18181b;
+  --tooltip-text: #fafafa;
+  --tooltip-sub: #a1a1aa;
 }
 
 body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); transition: background 0.2s; -webkit-font-smoothing: antialiased; }
