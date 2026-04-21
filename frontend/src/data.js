@@ -117,9 +117,25 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
   const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const meanReturn = isLiquidGroup ? -0.1 + (seed % 10)/200 : 0.01 + (seed % 10)/1000;
   return { 
-    ticker, rank, stats: { meanReturn, stdReturn: 1.5, avgRollingVol: 15 }, vol: { histVol: 15, garchVol: 20 }, correlation: { vol_amihud: 0.2 }, 
+    ticker, rank, stats: { meanReturn, stdReturn: 1.5, avgRollingVol: 15 }, 
+    vol: { histVol: 15, garchVol: 20, dailyCondVol: 1.25 }, 
+    correlation: { vol_amihud: 0.2 }, 
     options: [], pnlSummary: { netDelta: 0, netGamma: 0, netVega: 0, netPremium: 0, hedgeQty: 0, hedgeCost: 0 }, 
-    pnlScenarios: [], varAnalysis: [], varMethods: [] 
+    pnlScenarios: [], 
+    varAnalysis: [
+      { regime: "Full Period", conf: "95%", mean: 0.01, vol: 1.2, varPct: 1.5, varRs: 15000 },
+      { regime: "Full Period", conf: "99%", mean: 0.01, vol: 1.2, varPct: 2.5, varRs: 25000 },
+      { regime: "Normal", conf: "95%", mean: 0.01, vol: 1.0, varPct: 1.2, varRs: 12000 },
+      { regime: "Normal", conf: "99%", mean: 0.01, vol: 1.0, varPct: 2.0, varRs: 20000 },
+      { regime: "High-Vol", conf: "95%", mean: 0.01, vol: 2.0, varPct: 3.5, varRs: 35000 },
+      { regime: "High-Vol", conf: "99%", mean: 0.01, vol: 2.0, varPct: 5.0, varRs: 50000 }
+    ], 
+    varMethods: [
+      { method: "Parametric-Normal", c95: 1.5, c99: 2.5 },
+      { method: "GARCH(1,1)", c95: 2.2, c99: 3.2 },
+      { method: "MC-Historical", c95: 1.6, c99: 2.6 },
+      { method: "MC-GARCH", c95: 2.3, c99: 3.3 }
+    ] 
   };
 };
 

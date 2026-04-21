@@ -1,6 +1,6 @@
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  CartesianGrid, Legend, Cell, LineChart, Line, AreaChart, Area, ComposedChart 
+  CartesianGrid, Legend, Cell, AreaChart, Area, ComposedChart, ReferenceLine 
 } from 'recharts';
 import { HISTOGRAM_DATA, RETURNS_DATA } from '../data';
 
@@ -48,9 +48,8 @@ export default function PartD({ illiquid, liquid }) {
           <YAxis tick={{ fontSize: 9 }} label={{ value: 'Density', angle: -90, position: 'insideLeft', fontSize: 10 }} />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey={dataKey} name="Empirical Returns" fill={color} fillOpacity={0.6} barSize={12} />
-          <Line type="monotone" dataKey={dataKey} stroke="#000" strokeWidth={2} dot={false} name="Fitted Normal" />
-          <line x1={`${50 + (var95 * -10)}%`} x2={`${50 + (var95 * -10)}%`} y1="0" y2="100%" stroke="#3b82f6" strokeDasharray="5 5" />
-          <line x1={`${50 + (var99 * -10)}%`} x2={`${50 + (var99 * -10)}%`} y1="0" y2="100%" stroke="#dc2626" strokeDasharray="5 5" />
+          <ReferenceLine x={var95.toFixed(1)} stroke="#3b82f6" strokeDasharray="5 5" label={{ value: '95%', position: 'top', fill: '#3b82f6', fontSize: 9 }} />
+          <ReferenceLine x={var99.toFixed(1)} stroke="#dc2626" strokeDasharray="5 5" label={{ value: '99%', position: 'top', fill: '#dc2626', fontSize: 9 }} />
         </ComposedChart>
       </ResponsiveContainer>
       <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', fontSize: '10px', marginTop: '8px' }}>
@@ -116,7 +115,7 @@ export default function PartD({ illiquid, liquid }) {
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 10 }} />
             <Bar dataKey="HDFCBANK 95%" fill="#3b82f6" fillOpacity={0.7} />
-            <Bar dataKey="NESTLEIND 95%" fill="#f87171" fillOpacity={0.7} hatch />
+            <Bar dataKey="NESTLEIND 95%" fill="#f87171" fillOpacity={0.7} />
             <Bar dataKey="HDFCBANK 99%" fill="#1d4ed8" />
             <Bar dataKey="NESTLEIND 99%" fill="#dc2626" />
           </BarChart>
@@ -195,38 +194,46 @@ export default function PartD({ illiquid, liquid }) {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>{liquid.ticker}</td>
-              <td style={{ fontWeight: 600 }}>GARCH(1,1)</td>
-              <td>{liquid.vol.dailyCondVol.toFixed(4)}%</td>
-              <td>{liquid.varMethods[1].c95.toFixed(4)}%</td>
-              <td>{liquid.varMethods[1].c99.toFixed(4)}%</td>
-              <td>₹69,454</td>
-            </tr>
-            <tr>
-              <td>{illiquid.ticker}</td>
-              <td style={{ fontWeight: 600 }}>GARCH(1,1)</td>
-              <td>{illiquid.vol.dailyCondVol.toFixed(4)}%</td>
-              <td>{illiquid.varMethods[1].c95.toFixed(4)}%</td>
-              <td>{illiquid.varMethods[1].c99.toFixed(4)}%</td>
-              <td>₹31,637</td>
-            </tr>
-            <tr style={{ borderTop: '1px solid var(--border)' }}>
-              <td>{liquid.ticker}</td>
-              <td>MC-Historical</td>
-              <td>-</td>
-              <td>{liquid.varMethods[2].c95.toFixed(4)}%</td>
-              <td>{liquid.varMethods[2].c99.toFixed(4)}%</td>
-              <td>₹33,571</td>
-            </tr>
-            <tr>
-              <td>{illiquid.ticker}</td>
-              <td>MC-Historical</td>
-              <td>-</td>
-              <td>{illiquid.varMethods[2].c95.toFixed(4)}%</td>
-              <td>{illiquid.varMethods[2].c99.toFixed(4)}%</td>
-              <td>₹25,086</td>
-            </tr>
+            {liquid.varMethods && liquid.varMethods.length > 1 && (
+              <>
+                <tr>
+                  <td>{liquid.ticker}</td>
+                  <td style={{ fontWeight: 600 }}>GARCH(1,1)</td>
+                  <td>{(liquid.vol?.dailyCondVol || 0).toFixed(4)}%</td>
+                  <td>{(liquid.varMethods[1]?.c95 || 0).toFixed(4)}%</td>
+                  <td>{(liquid.varMethods[1]?.c99 || 0).toFixed(4)}%</td>
+                  <td>₹{(liquid.varMethods[1]?.c99 * 10000 || 0).toLocaleString()}</td>
+                </tr>
+                <tr>
+                  <td>{illiquid.ticker}</td>
+                  <td style={{ fontWeight: 600 }}>GARCH(1,1)</td>
+                  <td>{(illiquid.vol?.dailyCondVol || 0).toFixed(4)}%</td>
+                  <td>{(illiquid.varMethods[1]?.c95 || 0).toFixed(4)}%</td>
+                  <td>{(illiquid.varMethods[1]?.c99 || 0).toFixed(4)}%</td>
+                  <td>₹{(illiquid.varMethods[1]?.c99 * 10000 || 0).toLocaleString()}</td>
+                </tr>
+              </>
+            )}
+            {liquid.varMethods && liquid.varMethods.length > 2 && (
+              <>
+                <tr style={{ borderTop: '1px solid var(--border)' }}>
+                  <td>{liquid.ticker}</td>
+                  <td>MC-Historical</td>
+                  <td>-</td>
+                  <td>{(liquid.varMethods[2]?.c95 || 0).toFixed(4)}%</td>
+                  <td>{(liquid.varMethods[2]?.c99 || 0).toFixed(4)}%</td>
+                  <td>₹{(liquid.varMethods[2]?.c99 * 10000 || 0).toLocaleString()}</td>
+                </tr>
+                <tr>
+                  <td>{illiquid.ticker}</td>
+                  <td>MC-Historical</td>
+                  <td>-</td>
+                  <td>{(illiquid.varMethods[2]?.c95 || 0).toFixed(4)}%</td>
+                  <td>{(illiquid.varMethods[2]?.c99 || 0).toFixed(4)}%</td>
+                  <td>₹{(illiquid.varMethods[2]?.c99 * 10000 || 0).toLocaleString()}</td>
+                </tr>
+              </>
+            )}
           </tbody>
         </table>
       </div>
