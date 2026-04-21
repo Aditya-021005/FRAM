@@ -99,7 +99,7 @@ export default function PartA({ illiquid, liquid }) {
       <div className="grid-2" style={{ marginTop: 32, gap: '24px' }}>
         {/* Row 1: Daily Log Returns */}
         <div className="chart-container">
-          <div className="chart-title">Daily Log Returns — Liquid ({liquid.ticker.replace('.NS','')})</div>
+          <div className="chart-title">Daily Log Returns — Liquid ({liquid.ticker})</div>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={RETURNS_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
@@ -111,7 +111,7 @@ export default function PartA({ illiquid, liquid }) {
           </ResponsiveContainer>
         </div>
         <div className="chart-container">
-          <div className="chart-title">Daily Log Returns — Illiquid ({illiquid.ticker.replace('.NS','')})</div>
+          <div className="chart-title">Daily Log Returns — Illiquid ({illiquid.ticker})</div>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={RETURNS_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
@@ -125,7 +125,7 @@ export default function PartA({ illiquid, liquid }) {
 
         {/* Row 2: Rolling Volatility */}
         <div className="chart-container">
-          <div className="chart-title">20-Day Rolling Volatility — Liquid</div>
+          <div className="chart-title">20-Day Rolling Volatility — Liquid ({liquid.ticker})</div>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={RETURNS_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
@@ -137,7 +137,7 @@ export default function PartA({ illiquid, liquid }) {
           </ResponsiveContainer>
         </div>
         <div className="chart-container">
-          <div className="chart-title">20-Day Rolling Volatility — Illiquid</div>
+          <div className="chart-title">20-Day Rolling Volatility — Illiquid ({illiquid.ticker})</div>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={RETURNS_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
@@ -151,24 +151,24 @@ export default function PartA({ illiquid, liquid }) {
 
         {/* Row 3: Amihud Illiquidity */}
         <div className="chart-container">
-          <div className="chart-title">Amihud Illiquidity (×10⁻⁹) — Liquid</div>
+          <div className="chart-title">Amihud Illiquidity — Liquid ({liquid.ticker})</div>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={RETURNS_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} name="Units of 10^-9" />
               <Tooltip content={<CustomTooltip />} />
               <Line type="monotone" dataKey="liqAmihud" stroke="var(--chart-1)" dot={false} strokeWidth={1} />
             </LineChart>
           </ResponsiveContainer>
         </div>
         <div className="chart-container">
-          <div className="chart-title">Amihud Illiquidity (×10⁻⁹) — Illiquid</div>
+          <div className="chart-title">Amihud Illiquidity — Illiquid ({illiquid.ticker})</div>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={RETURNS_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} name="Units of 10^-9" />
               <Tooltip content={<CustomTooltip />} />
               <Line type="monotone" dataKey="illiqAmihud" stroke="var(--chart-2)" dot={false} strokeWidth={1} />
             </LineChart>
@@ -177,7 +177,7 @@ export default function PartA({ illiquid, liquid }) {
 
         {/* Row 4: Volatility vs Amihud Scatter */}
         <div className="chart-container">
-          <div className="chart-title">Volatility vs Amihud — Liquid</div>
+          <div className="chart-title">Volatility vs Amihud — Liquid ({liquid.ticker})</div>
           <ResponsiveContainer width="100%" height={180}>
             <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
@@ -189,7 +189,7 @@ export default function PartA({ illiquid, liquid }) {
           </ResponsiveContainer>
         </div>
         <div className="chart-container">
-          <div className="chart-title">Volatility vs Amihud — Illiquid</div>
+          <div className="chart-title">Volatility vs Amihud — Illiquid ({illiquid.ticker})</div>
           <ResponsiveContainer width="100%" height={180}>
             <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />

@@ -65,14 +65,19 @@ export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
   const p = i / 120;
   
   // mimics HDFCBANK (Liquid): Vol starts 10% -> 45%
-  const liqVol = 10 + (p < 0.6 ? p * 12 : 12 + (p - 0.6) * 110) + Math.random() * 2;
-  const liqRet = (Math.random() - 0.5) * (liqVol / 400);
-  const liqAm = (Math.random() * 0.0006) + (Math.random() > 0.9 ? Math.random() * 0.0008 : 0);
+  // Using a smoother noise for vol to avoid jumpy charts
+  const liqVolBase = 10 + (p < 0.6 ? p * 12 : 12 + (p-0.6)*110);
+  const liqVol = liqVolBase + Math.sin(i * 0.2) * 2;
+  
+  // Log returns with volatility clustering
+  const liqRet = (Math.random() - 0.5) * (liqVol / 400) + Math.sin(i * 0.1) * 0.002;
+  const liqAm = (Math.random() * 0.0005) + (Math.sin(i * 0.3) > 0.8 ? 0.0006 : 0);
 
   // mimics NESTLEIND (Illiquid): Vol starts 8% -> 23%
-  const illiqVol = 8 + p * 14 + Math.random() * 3;
-  const illiqRet = (Math.random() - 0.5) * (illiqVol / 300);
-  const illiqAm = (Math.random() * 0.015) + (Math.random() > 0.85 ? Math.random() * 0.01 : 0);
+  const illiqVolBase = 8 + p * 14;
+  const illiqVol = illiqVolBase + Math.sin(i * 0.15) * 3;
+  const illiqRet = (Math.random() - 0.5) * (illiqVol / 300) + Math.sin(i * 0.08) * 0.003;
+  const illiqAm = (Math.random() * 0.012) + (Math.sin(i * 0.25) > 0.7 ? 0.010 : 0);
 
   return {
     date: date.toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
