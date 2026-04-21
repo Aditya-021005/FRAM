@@ -59,4 +59,28 @@ export const getIlliquidData = (ticker) => {
 
 export const getLiquidData = (ticker) => (ticker === 'HDFCBANK.NS' ? LIQUID_DATA : LIQUID_DATA);
 
-export const RETURNS_DATA = [{"date": "Nov 03", "liqReturn": 0.009, "illiqReturn": 0.012, "liqVol": 10.2, "illiqVol": 8.5, "liqAmihud": 0.0003, "illiqAmihud": 0.006}, {"date": "Nov 10", "liqReturn": -0.004, "illiqReturn": -0.008, "liqVol": 11.5, "illiqVol": 9.2, "liqAmihud": 0.0004, "illiqAmihud": 0.007}, {"date": "Nov 17", "liqReturn": 0.015, "illiqReturn": 0.011, "liqVol": 10.8, "illiqVol": 8.9, "liqAmihud": 0.0003, "illiqAmihud": 0.006}, {"date": "Nov 24", "liqReturn": -0.012, "illiqReturn": -0.015, "liqVol": 12.1, "illiqVol": 10.4, "liqAmihud": 0.0005, "illiqAmihud": 0.008}, {"date": "Dec 01", "liqReturn": 0.022, "illiqReturn": 0.018, "liqVol": 11.4, "illiqVol": 9.8, "liqAmihud": 0.0004, "illiqAmihud": 0.007}, {"date": "Dec 08", "liqReturn": -0.008, "illiqReturn": -0.011, "liqVol": 13.5, "illiqVol": 11.2, "liqAmihud": 0.0006, "illiqAmihud": 0.009}, {"date": "Dec 15", "liqReturn": 0.028, "illiqReturn": 0.021, "liqVol": 12.8, "illiqVol": 10.5, "liqAmihud": 0.0005, "illiqAmihud": 0.008}, {"date": "Dec 22", "liqReturn": -0.016, "illiqReturn": -0.020, "liqVol": 14.2, "illiqVol": 12.6, "liqAmihud": 0.0007, "illiqAmihud": 0.011}, {"date": "Dec 29", "liqReturn": 0.032, "illiqReturn": 0.025, "liqVol": 13.6, "illiqVol": 11.8, "liqAmihud": 0.0006, "illiqAmihud": 0.010}, {"date": "Jan 05", "liqReturn": -0.011, "illiqReturn": -0.014, "liqVol": 15.4, "illiqVol": 13.2, "liqAmihud": 0.0008, "illiqAmihud": 0.013}, {"date": "Jan 12", "liqReturn": 0.019, "illiqReturn": 0.015, "liqVol": 14.8, "illiqVol": 12.5, "liqAmihud": 0.0007, "illiqAmihud": 0.012}, {"date": "Jan 19", "liqReturn": -0.009, "illiqReturn": -0.012, "liqVol": 16.5, "illiqVol": 14.8, "liqAmihud": 0.0009, "illiqAmihud": 0.015}, {"date": "Jan 26", "liqReturn": 0.025, "illiqReturn": 0.019, "liqVol": 15.1, "illiqVol": 13.4, "liqAmihud": 0.0008, "illiqAmihud": 0.014}, {"date": "Feb 02", "liqReturn": -0.014, "illiqReturn": -0.018, "liqVol": 17.2, "illiqVol": 15.6, "liqAmihud": 0.0010, "illiqAmihud": 0.018}, {"date": "Feb 09", "liqReturn": 0.038, "illiqReturn": 0.028, "liqVol": 16.5, "illiqVol": 14.2, "liqAmihud": 0.0009, "illiqAmihud": 0.017}, {"date": "Feb 16", "liqReturn": -0.021, "illiqReturn": -0.025, "liqVol": 19.8, "illiqVol": 17.4, "liqAmihud": 0.0011, "illiqAmihud": 0.021}, {"date": "Feb 23", "liqReturn": 0.035, "illiqReturn": 0.026, "liqVol": 18.2, "illiqVol": 15.8, "liqAmihud": 0.0010, "illiqAmihud": 0.020}, {"date": "Mar 02", "liqReturn": -0.028, "illiqReturn": -0.032, "liqVol": 25.4, "illiqVol": 19.2, "liqAmihud": 0.0013, "illiqAmihud": 0.025}, {"date": "Mar 09", "liqReturn": 0.042, "illiqReturn": 0.031, "liqVol": 32.1, "illiqVol": 20.5, "liqAmihud": 0.0015, "illiqAmihud": 0.028}, {"date": "Mar 16", "liqReturn": -0.051, "illiqReturn": -0.062, "liqVol": 38.6, "illiqVol": 22.1, "liqAmihud": 0.0018, "illiqAmihud": 0.032}, {"date": "Mar 23", "liqReturn": 0.048, "illiqReturn": 0.035, "liqVol": 42.4, "illiqVol": 21.8, "liqAmihud": 0.0017, "illiqAmihud": 0.030}, {"date": "Mar 30", "liqReturn": -0.033, "illiqReturn": -0.045, "liqVol": 44.8, "illiqVol": 22.4, "liqAmihud": 0.0018, "illiqAmihud": 0.033}, {"date": "Apr 06", "liqReturn": 0.052, "illiqReturn": 0.038, "liqVol": 45.1, "illiqVol": 23.2, "liqAmihud": 0.0019, "illiqAmihud": 0.035}, {"date": "Apr 13", "liqReturn": -0.019, "illiqReturn": -0.024, "liqVol": 45.4, "illiqVol": 22.9, "liqAmihud": 0.0020, "illiqAmihud": 0.036}];
+export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
+  const date = new Date(2025, 10, 1);
+  date.setDate(date.getDate() + i);
+  const p = i / 120;
+  
+  // mimics HDFCBANK (Liquid): Vol starts 10% -> 45%
+  const liqVol = 10 + (p < 0.6 ? p * 12 : 12 + (p - 0.6) * 110) + Math.random() * 2;
+  const liqRet = (Math.random() - 0.5) * (liqVol / 400);
+  const liqAm = (Math.random() * 0.0006) + (Math.random() > 0.9 ? Math.random() * 0.0008 : 0);
+
+  // mimics NESTLEIND (Illiquid): Vol starts 8% -> 23%
+  const illiqVol = 8 + p * 14 + Math.random() * 3;
+  const illiqRet = (Math.random() - 0.5) * (illiqVol / 300);
+  const illiqAm = (Math.random() * 0.015) + (Math.random() > 0.85 ? Math.random() * 0.01 : 0);
+
+  return {
+    date: date.toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
+    liqReturn: liqRet,
+    illiqReturn: illiqRet,
+    liqVol: liqVol,
+    illiqVol: illiqVol,
+    liqAmihud: liqAm,
+    illiqAmihud: illiqAm
+  };
+});
