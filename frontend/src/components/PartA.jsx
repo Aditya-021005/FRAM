@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line } from 'recharts';
-import { NIFTY50_RANKING, RETURNS_DATA, LIQUID_DATA } from '../data';
+import { NIFTY50_RANKING, RETURNS_DATA, LIQUID_DATA, getIlliquidData } from '../data';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -29,6 +29,7 @@ export default function PartA({ illiquid }) {
   }));
 
   const liq = LIQUID_DATA;
+  const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
 
   return (
     <div className="slide-up fade-in">
@@ -60,7 +61,7 @@ export default function PartA({ illiquid }) {
         <div className="chart-title">Turnover Ranking — Top 25% vs Bottom 25%</div>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey="name" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
@@ -78,7 +79,7 @@ export default function PartA({ illiquid }) {
           <div className="chart-title">6-Month Returns Profile (%)</div>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={RETURNS_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
@@ -91,7 +92,7 @@ export default function PartA({ illiquid }) {
           <div className="chart-title">20-Day Rolling Volatility</div>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={RETURNS_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
@@ -103,7 +104,8 @@ export default function PartA({ illiquid }) {
       </div>
 
       <div className="table-container" style={{ marginTop: 32 }}>
-        <table>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: '14px' }}>NIFTY 50 Liquidity & Risk Comparison</div>
+        <table style={{ minWidth: '800px' }}>
           <thead>
             <tr>
               <th>Security</th>
@@ -114,20 +116,26 @@ export default function PartA({ illiquid }) {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>{liq.ticker} (Liquid)</td>
+            <tr style={{ background: 'var(--bg-secondary)', fontWeight: 600 }}>
+              <td>{liq.ticker} <span className="tag">Liquid</span></td>
               <td>{liq.stats.meanReturn.toFixed(4)}%</td>
               <td>{liq.stats.stdReturn.toFixed(2)}%</td>
               <td>₹{liq.stats.avgTurnover}</td>
               <td>{liq.stats.avgAmihud.toFixed(4)}</td>
             </tr>
-            <tr>
-              <td>{illiquid.ticker} (Selected)</td>
-              <td>{illiquid.stats.meanReturn.toFixed(4)}%</td>
-              <td>{illiquid.stats.stdReturn.toFixed(2)}%</td>
-              <td>₹{illiquid.stats.avgTurnover}</td>
-              <td>{illiquid.stats.avgAmihud.toFixed(4)}</td>
-            </tr>
+            {illiquidStocks.map(s => {
+              const data = getIlliquidData(s.ticker);
+              const isSelected = s.ticker === illiquid.ticker;
+              return (
+                <tr key={s.ticker} style={isSelected ? { background: 'var(--accent)', color: 'var(--accent-fg)' } : {}}>
+                  <td>{s.ticker} {isSelected && <span className="tag" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>Selected</span>}</td>
+                  <td>{data.stats.meanReturn.toFixed(4)}%</td>
+                  <td>{data.stats.stdReturn.toFixed(2)}%</td>
+                  <td>₹{s.turnover.toFixed(2)}</td>
+                  <td>{data.stats.avgAmihud.toFixed(4)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
