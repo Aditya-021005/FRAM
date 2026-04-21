@@ -28,15 +28,28 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
       correlation: { vol_amihud: 0.2379 },
       spot: 731.55,
       options: [
-        { strikeLabel: "ATM", dte: 29, strike: 730, mktPrice: 14.64, bsmHist: 14.68, bsmGarch: 39.50, devPct: -0.25, delta: 0.52, gamma: 0.002, vega: 1.2 },
-        { strikeLabel: "OTM_Call", dte: 29, strike: 780, mktPrice: 1.08, bsmHist: 1.09, bsmGarch: 19.96, devPct: -0.77, delta: 0.12, gamma: 0.001, vega: 0.4 },
-        { strikeLabel: "OTM_Put", dte: 29, strike: 680, mktPrice: 0.37, bsmHist: 0.37, bsmGarch: 14.97, devPct: 0.67, delta: -0.15, gamma: 0.0012, vega: 0.6 },
-        { strikeLabel: "ATM", dte: 57, strike: 730, mktPrice: 21.39, bsmHist: 21.18, bsmGarch: 55.79, devPct: 0.98, delta: 0.55 },
-        { strikeLabel: "OTM_Call", dte: 57, strike: 780, mktPrice: 4.09, bsmHist: 4.06, bsmGarch: 35.27, devPct: 0.57, delta: 0.18 },
-        { strikeLabel: "OTM_Put", dte: 57, strike: 680, mktPrice: 1.53, bsmHist: 1.54, bsmGarch: 26.51, devPct: -0.77, delta: -0.12 }
+        { strikeLabel: "ATM", dte: 29, strike: 730, mktPrice: 14.64, bsmHist: 14.68, bsmGarch: 39.50, devPct: -0.25, delta: 0.5694, gamma: 0.0128, vega: 0.8094 },
+        { strikeLabel: "OTM_Call", dte: 29, strike: 780, mktPrice: 1.08, bsmHist: 1.09, bsmGarch: 19.96, devPct: -0.77, delta: 0.0797, gamma: 0.0048, vega: 0.3057 },
+        { strikeLabel: "OTM_Put", dte: 29, strike: 680, mktPrice: 0.37, bsmHist: 0.37, bsmGarch: 14.97, devPct: 0.67, delta: -0.0307, gamma: 0.0023, vega: 0.1429 },
+        { strikeLabel: "ATM", dte: 57, strike: 730, mktPrice: 21.39, bsmHist: 21.18, bsmGarch: 55.79, devPct: 0.98, delta: 0.5830, gamma: 0.0091, vega: 1.1260 },
+        { strikeLabel: "OTM_Call", dte: 57, strike: 780, mktPrice: 4.09, bsmHist: 4.06, bsmGarch: 35.27, devPct: 0.57, delta: 0.1793, gamma: 0.0061, vega: 0.7563 },
+        { strikeLabel: "OTM_Put", dte: 57, strike: 680, mktPrice: 1.53, bsmHist: 1.54, bsmGarch: 26.51, devPct: -0.77, delta: -0.0776, gamma: 0.0034, vega: 0.4198 }
       ],
-      pnl: [{ priceShock: "-2%", volShock: "-20%", totalPnl: -400 }, { priceShock: "+2%", volShock: "+20%", totalPnl: 500 }],
-      var: [{ regime: "Full Period", varPct: 2.15, varRs: 21500 }, { regime: "High Vol", varPct: 3.42, varRs: 34200 }]
+      pnlSummary: {
+        strategy: "Calendar Bull Call Spread",
+        netDelta: 239.875, netGamma: 4.884, netVega: 215.625, netPremium: 6299.58,
+        hedgeQty: -239.875, hedgeCost: -175480.55
+      },
+      pnlScenarios: [
+        { shock: "-2%", vShock: "-20%", total: -117.76, d: -3509.61, g: 522.78, v: -640.54, h: 3509.61 },
+        { shock: "-2%", vShock: "+20%", total: 1163.32, d: -3509.61, g: 522.78, v: 640.54, h: 3509.61 },
+        { shock: "-1%", vShock: "-20%", total: -509.84, d: -1754.81, g: 130.69, v: -640.54, h: 1754.81 },
+        { shock: "-1%", vShock: "+20%", total: 771.23, d: -1754.81, g: 130.69, v: 640.54, h: 1754.81 },
+        { shock: "+1%", vShock: "-20%", total: -509.84, d: 1754.81, g: 130.69, v: -640.54, h: -1754.81 },
+        { shock: "+1%", vShock: "+20%", total: 771.23, d: 1754.81, g: 130.69, v: 640.54, h: -1754.81 },
+        { shock: "+2%", vShock: "-20%", total: -117.76, d: 3509.61, g: 522.78, v: -640.54, h: -3509.61 },
+        { shock: "+2%", vShock: "+20%", total: 1163.32, d: 3509.61, g: 522.78, v: 640.54, h: -3509.61 }
+      ]
     };
   }
   if (ticker === 'NESTLEIND.NS') {
@@ -47,35 +60,33 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
       correlation: { vol_amihud: 0.1763 },
       spot: 1174.80,
       options: [
-        { strikeLabel: "ATM", dte: 29, strike: 1150, mktPrice: 40.34, bsmHist: 39.41, bsmGarch: 44.85, devPct: 2.37, delta: 0.48, gamma: 0.003, vega: 1.4 },
-        { strikeLabel: "OTM_Call", dte: 29, strike: 1250, mktPrice: 2.82, bsmHist: 2.79, bsmGarch: 6.29, devPct: 1.08, delta: 0.10, gamma: 0.001, vega: 0.5 },
-        { strikeLabel: "OTM_Put", dte: 29, strike: 1100, mktPrice: 1.51, bsmHist: 1.45, bsmGarch: 3.91, devPct: 4.67, delta: -0.12, gamma: 0.0012, vega: 0.6 },
-        { strikeLabel: "ATM", dte: 57, strike: 1150, mktPrice: 52.91, bsmHist: 50.18, bsmGarch: 58.08, devPct: 5.45, delta: 0.52 },
-        { strikeLabel: "OTM_Call", dte: 57, strike: 1250, mktPrice: 9.28, bsmHist: 8.88, bsmGarch: 15.75, devPct: 4.42, delta: 0.14 },
-        { strikeLabel: "OTM_Put", dte: 57, strike: 1100, mktPrice: 4.55, bsmHist: 4.50, bsmGarch: 9.53, devPct: 1.07, delta: -0.10 }
+        { strikeLabel: "ATM", dte: 29, strike: 1150, mktPrice: 40.34, bsmHist: 39.41, bsmGarch: 44.85, devPct: 2.37, delta: 0.7190, gamma: 0.0062, vega: 1.1147 },
+        { strikeLabel: "OTM_Call", dte: 29, strike: 1250, mktPrice: 2.82, bsmHist: 2.79, bsmGarch: 6.29, devPct: 1.08, delta: 0.1092, gamma: 0.0035, vega: 0.6195 },
+        { strikeLabel: "OTM_Put", dte: 29, strike: 1100, mktPrice: 1.51, bsmHist: 1.45, bsmGarch: 3.91, devPct: 4.67, delta: -0.0608, gamma: 0.0022, vega: 0.3987 },
+        { strikeLabel: "ATM", dte: 57, strike: 1150, mktPrice: 52.91, bsmHist: 50.18, bsmGarch: 58.08, devPct: 5.45, delta: 0.6890, gamma: 0.0046, vega: 1.6352 },
+        { strikeLabel: "OTM_Call", dte: 57, strike: 1250, mktPrice: 9.28, bsmHist: 8.88, bsmGarch: 15.75, devPct: 4.42, delta: 0.2126, gamma: 0.0038, vega: 1.3469 },
+        { strikeLabel: "OTM_Put", dte: 57, strike: 1100, mktPrice: 4.50, bsmHist: 4.50, bsmGarch: 9.53, devPct: 1.07, delta: -0.1178, gamma: 0.0026, vega: 0.9165 }
       ],
-      pnl: [{ priceShock: "-2%", volShock: "-20%", totalPnl: -800 }, { priceShock: "+2%", volShock: "+20%", totalPnl: 900 }],
-      var: [{ regime: "Full Period", varPct: 1.85, varRs: 18500 }, { regime: "High Vol", varPct: 2.95, varRs: 29500 }]
+      pnlSummary: {
+        strategy: "Diagonal Protective Put",
+        netDelta: 241.7, netGamma: 5.7165, netVega: 1473.85, netPremium: 24723.16,
+        hedgeQty: -241.7, hedgeCost: -283949.17
+      },
+      pnlScenarios: [
+        { shock: "-2%", vShock: "-20%", total: -3235.28, d: -5678.98, g: 1577.93, v: -4813.21, h: 5678.98 },
+        { shock: "-2%", vShock: "+20%", total: 6391.14, d: -5678.98, g: 1577.93, v: 4813.21, h: 5678.98 },
+        { shock: "-1%", vShock: "-20%", total: -4418.73, d: -2839.49, g: 394.48, v: -4813.21, h: 2839.49 },
+        { shock: "-1%", vShock: "+20%", total: 5207.69, d: -2839.49, g: 394.48, v: 4813.21, h: 2839.49 },
+        { shock: "+1%", vShock: "-20%", total: -4418.73, d: 2839.49, g: 394.48, v: -4813.21, h: -2839.49 },
+        { shock: "+1%", vShock: "+20%", total: 5207.69, d: 2839.49, g: 394.48, v: 4813.21, h: -2839.49 },
+        { shock: "+2%", vShock: "-20%", total: -3235.28, d: 5678.98, g: 1577.93, v: -4813.21, h: -5678.98 },
+        { shock: "+2%", vShock: "+20%", total: 6391.14, d: 5678.98, g: 1577.93, v: 4813.21, h: -5678.98 }
+      ]
     };
   }
 
-  // Fallback for others - ADDED MISSING PROPS
-  const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const meanReturn = isLiquidGroup ? -0.1 + (seed % 10)/200 : 0.01 + (seed % 10)/1000;
-  const stdReturn = isLiquidGroup ? 1.4 + (seed % 5)/20 : 1.1 + (seed % 5)/50;
-  return {
-    ticker, rank,
-    stats: { meanReturn, stdReturn, minReturn: meanReturn - 3*stdReturn, maxReturn: meanReturn + 3*stdReturn, avgTurnover: stockInfo.turnover, avgAmihud: isLiquidGroup ? 0.0004 : 0.005, avgRollingVol: 15 },
-    vol: { histVol: 15, garchVol: 16, longRunVol: 15, persistence: 0.98 },
-    correlation: { vol_amihud: 0.20 },
-    options: [
-      { strikeLabel: "ATM", dte: 29, mktPrice: 50, bsmHist: 48, bsmGarch: 52, delta: 0.5, gamma: 0.002, vega: 1.0 },
-      { strikeLabel: "OTM_Call", dte: 29, mktPrice: 15, bsmHist: 14, bsmGarch: 16, delta: 0.15, gamma: 0.001, vega: 0.4 },
-      { strikeLabel: "OTM_Put", dte: 29, mktPrice: 18, bsmHist: 17, bsmGarch: 19, delta: -0.18, gamma: 0.001, vega: 0.5 }
-    ],
-    pnl: [{ priceShock: "-2%", volShock: "-20%", totalPnl: -350 }, { priceShock: "+2%", volShock: "+20%", totalPnl: 450 }],
-    var: [{ regime: "Normal", varPct: 1.5, varRs: 15000 }, { regime: "Stressed", varPct: 2.5, varRs: 29500 }]
-  };
+  // Fallback for others
+  return { ticker, rank, stats: {}, vol: {}, correlation: {}, options: [], pnlSummary: {}, pnlScenarios: [] };
 };
 
 export const LIQUID_DATA = generateStockData("HDFCBANK.NS", true);
@@ -86,18 +97,7 @@ export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
   const date = new Date(2025, 10, 1);
   date.setDate(date.getDate() + (i * 1.5));
   const p = i / 120;
-  const liqVolBase = 10 + (p < 0.6 ? p * 12 : 12 + (p-0.6)*110);
-  const liqVol = liqVolBase + Math.sin(i * 0.2) * 2;
-  const liqRet = (Math.random() - 0.5) * (liqVol / 400) + Math.sin(i * 0.1) * 0.002;
-  const liqAm = (Math.random() * 0.0005) + (Math.sin(i * 0.3) > 0.8 ? 0.0006 : 0);
-  const illiqVolBase = 8 + p * 14;
-  const illiqVol = illiqVolBase + Math.sin(i * 0.15) * 3;
-  const illiqRet = (Math.random() - 0.5) * (illiqVol / 300) + Math.sin(i * 0.08) * 0.003;
-  const illiqAm = (Math.random() * 0.012) + (Math.sin(i * 0.25) > 0.7 ? 0.010 : 0);
-  return {
-    date: date.toLocaleDateString("en-IN", { year:'2-digit', month: "short" }),
-    liqReturn: liqRet, illiqReturn: illiqRet,
-    liqVol, illiqVol,
-    liqAmihud: liqAm, illiqAmihud: illiqAm
-  };
+  const liqVol = 35 + Math.sin(i * 0.1) * 2 + (p > 0.8 ? (p - 0.8) * 150 : 0) + Math.random() * 5;
+  const illiqVol = 32 + p * 15 + Math.sin(i * 0.05) * 1;
+  return { date: date.toLocaleDateString("en-IN", { year:'2-digit', month: "short" }), liqReturn: 0, illiqReturn: 0, liqVol, illiqVol, liqAmihud: 0, illiqAmihud: 0 };
 });

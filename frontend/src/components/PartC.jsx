@@ -1,144 +1,192 @@
-import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData, getLiquidData } from '../data';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, Cell } from 'recharts';
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{ background: 'var(--tooltip-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 11, boxShadow: 'var(--shadow-sm)' }}>
+      <p style={{ fontWeight: 600, marginBottom: 4, color: 'var(--tooltip-text)' }}>{label}</p>
+      {payload.map((p, i) => (
+        <p key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(4) : p.value}</p>
+      ))}
+    </div>
+  );
+};
 
 export default function PartC({ illiquid, liquid }) {
-  const liqStocks = NIFTY50_RANKING.filter(s => s.category === 'LIQUID');
-  const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
 
-  const headerBadge = (
-    <div style={{ display: 'flex', gap: '8px', fontSize: '12px', fontWeight: 400, color: 'var(--text-secondary)' }}>
-      <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>L</span> Liquid
-      <span style={{ background: 'var(--bg-muted)', color: 'var(--text-primary)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', fontWeight: 600 }}>I</span> Illiquid
+  const getGreeksChartData = (stock) => {
+    const strikes = ["ATM", "OTM_Call", "OTM_Put"];
+    return strikes.map(s => {
+      const d29 = stock.options.find(o => o.strikeLabel === s && o.dte === 29);
+      const d57 = stock.options.find(o => o.strikeLabel === s && o.dte === 57);
+      return {
+        name: s,
+        'Delta DTE=29': d29?.delta,
+        'Vega DTE=29': d29?.vega,
+        'Gamma DTE=29': d29?.gamma,
+        'Delta DTE=57': d57?.delta,
+        'Vega DTE=57': d57?.vega,
+        'Gamma DTE=57': d57?.gamma,
+      };
+    });
+  };
+
+  const getPnLDecompData = (stock) => {
+    return stock.pnlScenarios.map(s => ({
+      name: `${s.shock}\n${s.vShock}`,
+      'Δ PnL': s.d,
+      'Γ PnL': s.g,
+      'Vega PnL': s.v,
+      'Hedge PnL': s.h,
+      total: s.total
+    }));
+  };
+
+  const GreeksChart = ({ stock, title }) => (
+    <div className="chart-container">
+      <div className="chart-title">{title}</div>
+      <div style={{ fontSize: '10px', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '8px' }}>DTE=29 solid | DTE=57 faded</div>
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={getGreeksChartData(stock)}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+          <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+          <YAxis yAxisId="left" tick={{ fontSize: 9 }} label={{ value: 'Delta / Vega', angle: -90, position: 'insideLeft', offset: 0, fontSize: 10 }} />
+          <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 9 }} label={{ value: 'Gamma', angle: 90, position: 'insideRight', fontSize: 10 }} />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend wrapperStyle={{ fontSize: 9 }} />
+          <Bar yAxisId="left" dataKey="Delta DTE=29" name="Delta DTE=29" fill="#3b82f6" />
+          <Bar yAxisId="left" dataKey="Vega DTE=29" name="Vega DTE=29" fill="#15803d" />
+          <Bar yAxisId="right" dataKey="Gamma DTE=29" name="Gamma DTE=29" fill="#ea580c" />
+          <Bar yAxisId="left" dataKey="Delta DTE=57" name="Delta DTE=57" fill="#3b82f6" fillOpacity={0.5} />
+          <Bar yAxisId="left" dataKey="Vega DTE=57" name="Vega DTE=57" fill="#15803d" fillOpacity={0.5} />
+          <Bar yAxisId="right" dataKey="Gamma DTE=57" name="Gamma DTE=57" fill="#ea580c" fillOpacity={0.5} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 
-  const LBadge = () => <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px' }}>L</span>;
-  const IBadge = () => <span style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>;
-  const SMBadge = ({ type }) => <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, width: '18px', textAlign: 'center' }}>{type}</span>;
+  const TotalPnLChart = ({ stock, title }) => (
+    <div className="chart-container">
+      <div className="chart-title">Total PnL (Options + Hedge) — {title}</div>
+      <ResponsiveContainer width="100%" height={180}>
+        <BarChart data={stock.pnlScenarios}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+          <XAxis dataKey="shock" tick={{ fontSize: 9 }} />
+          <YAxis tick={{ fontSize: 9 }} label={{ value: 'PnL (₹)', angle: -90, position: 'insideLeft', fontSize: 10 }} />
+          <Tooltip content={<CustomTooltip />} />
+          <Bar dataKey="total" name="Total PnL">
+            {stock.pnlScenarios.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.total >= 0 ? '#16a34a' : '#dc2626'} fillOpacity={0.7} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 
-  const pinStyle = (left) => ({ borderLeft: `3px solid ${left ? 'var(--accent)' : 'var(--text-secondary)'}`, background: 'var(--bg-muted)' });
+  const DecompChart = ({ stock, title }) => (
+    <div className="chart-container">
+      <div className="chart-title">PnL Decomposition by Greek Component — {title}</div>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={getPnLDecompData(stock)}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+          <XAxis dataKey="name" tick={{ fontSize: 8 }} />
+          <YAxis tick={{ fontSize: 9 }} />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend wrapperStyle={{ fontSize: 9 }} />
+          <Bar dataKey="Δ PnL" fill="#3b82f6" />
+          <Bar dataKey="Γ PnL" fill="#ea580c" />
+          <Bar dataKey="Vega PnL" fill="#15803d" />
+          <Bar dataKey="Hedge PnL" fill="#be185d" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 
-  // For the main card, let's show the Illiquid strategy as per previous layout, or make it dynamic if the user selects.
-  const getStrategy = (s) => s.rank <= 12 ? {
-    name: 'Calendar Bull Call Spread',
-    legs: 'Long 2× ATM Call (30d) + Short 1× OTM Call (60d)',
-    calc: () => {
-      const atm30 = s.options.find(o => o.strikeLabel === 'ATM') || s.options[0];
-      const otm60 = s.options.find(o => o.strikeLabel === 'OTM_Call') || s.options[1];
-      const netDelta = (2 * atm30.delta) + (-1 * otm60.delta);
-      const netGamma = (2 * atm30.gamma) + (-1 * otm60.gamma);
-      const netVega = (2 * atm30.vega) + (-1 * otm60.vega);
-      const cost = (2 * atm30.mktPrice - 1 * otm60.mktPrice) * 100;
-      return { netDelta, netGamma, netVega, cost };
-    }
-  } : {
-    name: 'Diagonal Protective Put',
-    legs: 'Long 1× ATM Call (30d) + Long 2× OTM Put (60d)',
-    calc: () => {
-      const atm30 = s.options.find(o => o.strikeLabel === 'ATM') || s.options[0];
-      const otm60p = s.options.find(o => o.strikeLabel === 'OTM_Put') || s.options[2] || s.options[0];
-      const netDelta = (1 * atm30.delta) + (2 * (otm60p.delta || -0.4)); // Fallback if delta missing
-      const netGamma = (1 * atm30.gamma) + (2 * (otm60p.gamma || 0.001));
-      const netVega = (1 * atm30.vega) + (2 * (otm60p.vega || 0.5));
-      const cost = (1 * atm30.mktPrice + 2 * otm60p.mktPrice) * 100;
-      return { netDelta, netGamma, netVega, cost };
-    }
-  };
-
-  const strat = getStrategy(illiquid);
-  const { netDelta, netGamma, netVega, cost } = strat.calc();
+  const StockSummary = ({ stock }) => (
+    <div className="card" style={{ marginBottom: '24px', border: '1px solid var(--border)', background: 'var(--bg-muted)' }}>
+      <div className="card-header" style={{ padding: '12px 20px', borderBottom: '1px solid var(--border)', background: 'var(--bg-muted)' }}>
+         <span style={{ fontWeight: 700, fontSize: '14px' }}>{stock.ticker} — {stock.pnlSummary.strategy}</span>
+      </div>
+      <div className="grid-4" style={{ padding: '16px 20px' }}>
+        <div><div className="greek-label">NET DELTA</div><div className="greek-value">+{stock.pnlSummary.netDelta.toFixed(4)}</div></div>
+        <div><div className="greek-label">NET GAMMA</div><div className="greek-value">+{stock.pnlSummary.netGamma.toFixed(4)}</div></div>
+        <div><div className="greek-label">NET VEGA</div><div className="greek-value">+{stock.pnlSummary.netVega.toFixed(4)}</div></div>
+        <div><div className="greek-label">NET PREMIUM</div><div className="greek-value" style={{ borderLeft: '2px solid var(--accent)', paddingLeft: '8px' }}>₹{stock.pnlSummary.netPremium.toLocaleString()}</div></div>
+      </div>
+      <div style={{ padding: '0 20px 16px', display: 'flex', gap: '24px', fontSize: '11px', color: 'var(--text-secondary)' }}>
+        <span>Hedge Action: <b>SHORT {Math.abs(stock.pnlSummary.hedgeQty).toFixed(2)} shares</b></span>
+        <span>Hedge Cash Inflow: <b>₹{Math.abs(stock.pnlSummary.hedgeCost).toLocaleString()}</b></span>
+        <span style={{ color: 'var(--accent)' }}>Post-Hedge Delta: <b>0.0000 ✓</b></span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="slide-up fade-in">
       <div className="section-header">
-        <h2 className="section-title">Greeks & Portfolio Hedging</h2>
-        <p className="section-subtitle">Analysis for {illiquid.ticker}. Impact of market liquidity on delta neutralise strategies.</p>
+        <h2 className="section-title">PnL Simulation & Greek Analysis</h2>
+        <p className="section-subtitle">Comprehensive attribution of portfolio returns to Delta, Gamma, Vega, and Delta-Hedging outcomes.</p>
       </div>
 
-      <div className="grid-2">
-        <div className="card">
-          <div className="card-header">
-            <span className="card-title">Portfolio Strategy</span>
-            <span className="tag" style={{ background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none' }}>{strat.name}</span>
-          </div>
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '12px', fontStyle: 'italic' }}>{strat.legs}</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
-              <span>Strategy Cost</span><span style={{ fontWeight: 600 }}>₹{Math.abs(cost).toLocaleString()}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
-              <span>Net Delta (Pre-Hedge)</span><span style={{ fontWeight: 600 }}>{netDelta.toFixed(4)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', color: 'var(--accent)', fontWeight: 700 }}>
-              <span>Net Delta (Post-Hedge)</span><span>0.0000</span>
-            </div>
-          </div>
-          <div className="grid-4" style={{ gap: '8px' }}>
-            <div className="greek-item"><div className="greek-label">Hedge Qty</div><div className="greek-value">{(-netDelta * 100).toFixed(0)}</div></div>
-            <div className="greek-item"><div className="greek-label">Gamma</div><div className="greek-value">{netGamma.toFixed(4)}</div></div>
-            <div className="greek-item"><div className="greek-label">Vega</div><div className="greek-value">{netVega.toFixed(2)}</div></div>
-            <div className="greek-item"><div className="greek-label">Theta</div><div className="greek-value">{(netVega * -0.6).toFixed(2)}</div></div>
-          </div>
-        </div>
-        <div className="insight-box">
-          <div className="insight-title">⚡ Hedging Summary</div>
-          <div className="insight-text">
-            To achieve a delta-neutral state for {illiquid.ticker}, a short position of {Math.abs(netDelta * 100).toFixed(0)} shares is required. 
-            The high Amihud ratio ({illiquid.stats.avgAmihud.toFixed(4)}) suggests significant execution slippage, potentially leaving a residual delta 
-            exposure if the full hedge cannot be filled at the model price.
-          </div>
-        </div>
+      <div className="grid-2" style={{ gap: '24px' }}>
+        <GreeksChart stock={liquid} title={`Greeks — ${liquid.ticker} (Liquid)`} />
+        <GreeksChart stock={illiquid} title={`Greeks — ${illiquid.ticker} (Illiquid)`} />
+        
+        <TotalPnLChart stock={liquid} title={`${liquid.ticker} (Liquid)`} />
+        <TotalPnLChart stock={illiquid} title={`${illiquid.ticker} (Illiquid)`} />
+
+        <DecompChart stock={liquid} title={liquid.ticker} />
+        <DecompChart stock={illiquid} title={illiquid.ticker} />
       </div>
 
-      <div className="table-container" style={{ marginTop: 32 }}>
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          Scenario PnL Matrix (All Securities) {headerBadge}
+      <div style={{ marginTop: '40px' }}>
+        <StockSummary stock={liquid} />
+        <StockSummary stock={illiquid} />
+      </div>
+
+      <div className="table-container" style={{ marginTop: '24px' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: '13px' }}>
+          Scenario PnL Simulation Table — {liquid.ticker} & {illiquid.ticker}
         </div>
         <table>
           <thead>
             <tr>
-              <th>Security</th>
-              <th>Bear Shock (-2%, -20%)</th>
-              <th>Bull Shock (+2%, +20%)</th>
-              <th>Residual Vol Risk</th>
+              <th>Ticker</th>
+              <th>Shock</th>
+              <th>Vol Shock</th>
+              <th>Δ PnL</th>
+              <th>Γ PnL</th>
+              <th>V PnL</th>
+              <th>Hedge PnL</th>
+              <th>Total PnL</th>
             </tr>
           </thead>
           <tbody>
-            <tr style={pinStyle(true)}>
-              <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><LBadge />{liquid.ticker}</td>
-              <td><span style={{ color: '#dc2626' }}>₹{liquid.pnl[0].totalPnl.toFixed(0)}</span></td>
-              <td><span style={{ color: '#16a34a' }}>₹{liquid.pnl[1].totalPnl.toFixed(0)}</span></td>
-              <td>{(liquid.vol.histVol * 0.1).toFixed(2)}%</td>
-            </tr>
-            <tr style={{ ...pinStyle(false), borderBottom: '2px solid var(--border)' }}>
-              <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><IBadge />{illiquid.ticker}</td>
-              <td><span style={{ color: '#dc2626' }}>₹{illiquid.pnl[0].totalPnl.toFixed(0)}</span></td>
-              <td><span style={{ color: '#16a34a' }}>₹{illiquid.pnl[1].totalPnl.toFixed(0)}</span></td>
-              <td>{(illiquid.vol.histVol * 0.1).toFixed(2)}%</td>
-            </tr>
-            {liqStocks.map(s => {
-              if (s.ticker === liquid.ticker) return null;
-              const data = getLiquidData(s.ticker);
-              return (
-                <tr key={s.ticker}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><SMBadge type="L" />{s.ticker}</td>
-                  <td><span style={{ color: '#dc2626' }}>₹{data.pnl[0].totalPnl.toFixed(0)}</span></td>
-                  <td><span style={{ color: '#16a34a' }}>₹{data.pnl[1].totalPnl.toFixed(0)}</span></td>
-                  <td>{(data.vol.histVol * 0.1).toFixed(2)}%</td>
-                </tr>
-              );
-            })}
-            {illiquidStocks.map(s => {
-              if (s.ticker === illiquid.ticker) return null;
-              const data = getIlliquidData(s.ticker);
-              return (
-                <tr key={s.ticker}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><SMBadge type="I" />{s.ticker}</td>
-                  <td><span style={{ color: '#dc2626' }}>₹{data.pnl[0].totalPnl.toFixed(0)}</span></td>
-                  <td><span style={{ color: '#16a34a' }}>₹{data.pnl[1].totalPnl.toFixed(0)}</span></td>
-                  <td>{(data.vol.histVol * 0.1).toFixed(2)}%</td>
-                </tr>
-              );
-            })}
+            {liquid.pnlScenarios.map((s, i) => (
+              <tr key={`liq-${i}`}>
+                <td>{liquid.ticker}</td>
+                <td>{s.shock}</td>
+                <td>{s.vShock}</td>
+                <td>₹{s.d.toLocaleString()}</td>
+                <td>₹{s.g.toLocaleString()}</td>
+                <td>₹{s.v.toLocaleString()}</td>
+                <td>₹{s.h.toLocaleString()}</td>
+                <td style={{ fontWeight: 700, color: s.total >= 0 ? 'var(--accent)' : '#dc2626' }}>₹{s.total.toLocaleString()}</td>
+              </tr>
+            ))}
+            {illiquid.pnlScenarios.map((s, i) => (
+              <tr key={`illiq-${i}`} style={{ background: i === 0 ? 'rgba(var(--accent-rgb), 0.03)' : 'transparent' }}>
+                <td>{illiquid.ticker}</td>
+                <td>{s.shock}</td>
+                <td>{s.vShock}</td>
+                <td>₹{s.d.toLocaleString()}</td>
+                <td>₹{s.g.toLocaleString()}</td>
+                <td>₹{s.v.toLocaleString()}</td>
+                <td>₹{s.h.toLocaleString()}</td>
+                <td style={{ fontWeight: 700, color: s.total >= 0 ? 'var(--accent)' : '#dc2626' }}>₹{s.total.toLocaleString()}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
