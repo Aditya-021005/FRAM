@@ -24,76 +24,77 @@ function App() {
 
   if (isLanding) {
     return (
-      <div className="landing fade-in" style={{ justifyContent: 'center', gap: 0 }}>
+      <div className="landing fade-in">
+        <div className="landing-blob" style={{ width: 500, height: 500, background: '#09090b', top: '-100px', left: '-150px', animationDuration: '9s' }} />
+        <div className="landing-blob" style={{ width: 400, height: 400, background: '#71717a', bottom: '-80px', right: '-100px', animationDuration: '7s', animationDelay: '1s' }} />
+        <div className="landing-blob" style={{ width: 300, height: 300, background: '#09090b', bottom: '10%', left: '20%', animationDuration: '11s', animationDelay: '2s' }} />
 
-        <div style={{ position: 'absolute', top: 20, right: 24 }}>
+        <div style={{ position: 'absolute', top: 20, right: 24, zIndex: 2 }}>
           <button className="btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px' }} onClick={() => setIsDark(!isDark)}>
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}
           </button>
         </div>
 
-        <div className="slide-up" style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', background: 'var(--bg-muted)', padding: '5px 14px', borderRadius: '100px', fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '28px', border: '1px solid var(--border)', letterSpacing: '0.08em' }}>
+        <div className="slide-up" style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', background: 'var(--bg-muted)', padding: '4px 14px', borderRadius: '100px', fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '20px', border: '1px solid var(--border)', letterSpacing: '0.08em' }}>
           <FiBarChart2 size={12} /> FIN F414 · FINANCIAL RISK MANAGEMENT
         </div>
 
-        <h1 className="slide-up" style={{ fontSize: '52px', maxWidth: '820px', marginBottom: '20px', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+        <h1 className="slide-up" style={{ fontSize: '48px', maxWidth: '760px', marginBottom: '16px', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
           Institutional Risk<br/>Analysis Platform
         </h1>
 
-        <p className="slide-up" style={{ fontSize: '16px', color: 'var(--text-secondary)', maxWidth: '560px', marginBottom: '52px', lineHeight: 1.7 }}>
-          Measure the impact of liquidity on option pricing, Greeks sensitivity, 
-          and regime-driven risk exposure across NIFTY 50 securities.
+        <p className="slide-up" style={{ fontSize: '15px', color: 'var(--text-secondary)', maxWidth: '520px', marginBottom: '32px', lineHeight: 1.7 }}>
+          Measure liquidity impact on option pricing, Greeks sensitivity,
+          and regime-driven risk across NIFTY 50 securities.
         </p>
 
-        <div className="grid-3 slide-up" style={{ marginBottom: '48px', textAlign: 'left', maxWidth: '860px', width: '100%' }}>
+        <div className="grid-3 slide-up" style={{ marginBottom: '32px', textAlign: 'left', maxWidth: '800px', width: '100%' }}>
           {[
-            { icon: <FiTrendingUp size={20} />, title: 'Liquidity Analysis', desc: 'Amihud illiquidity ratios and turnover-based NIFTY 50 ranking' },
-            { icon: <FiActivity size={20} />, title: 'Option Pricing', desc: 'BSM model integrated with GARCH(1,1) conditional volatility estimates' },
-            { icon: <FiShield size={20} />, title: 'Risk Management', desc: 'Multi-regime VaR and slippage-adjusted delta hedging simulations' },
+            { icon: <FiTrendingUp size={18} />, title: 'Liquidity Ranking', desc: 'Amihud ratios & turnover-based NIFTY 50 tiers' },
+            { icon: <FiActivity size={18} />, title: 'Option Pricing', desc: 'BSM + GARCH(1,1) conditional volatility models' },
+            { icon: <FiShield size={18} />, title: 'Risk Management', desc: 'Multi-regime VaR with slippage-adjusted hedging' },
           ].map((f, i) => (
-            <div key={i} className="card" style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ width: 40, height: 40, borderRadius: 8, background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)' }}>
-                {f.icon}
-              </div>
+            <div key={i} className="card" style={{ padding: '16px 18px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{f.icon}</div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>{f.title}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{f.desc}</div>
+                <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '4px' }}>{f.title}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{f.desc}</div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="card scale-in" style={{ padding: '32px', maxWidth: '660px', width: '100%', border: '1.5px solid var(--accent)' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '20px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Select Securities to Analyse</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+        <div className="card scale-in" style={{ padding: '24px 28px', maxWidth: '640px', width: '100%', border: '1.5px solid var(--accent)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
             <div>
-              <label style={{ fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)' }}>Liquid (Top 25%)</label>
+              <label style={{ fontSize: '11px', fontWeight: 700, display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-secondary)' }}>Liquid (Top 25%)</label>
               <select value={liquidTicker} onChange={(e) => setLiquidTicker(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
                 {liquidStocks.map(s => <option key={s.ticker} value={s.ticker}>{s.ticker.replace('.NS', '')} — Rank #{s.rank}</option>)}
               </select>
             </div>
             <div>
-              <label style={{ fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)' }}>Illiquid (Bottom 25%)</label>
+              <label style={{ fontSize: '11px', fontWeight: 700, display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-secondary)' }}>Illiquid (Bottom 25%)</label>
               <select value={illiquidTicker} onChange={(e) => setIlliquidTicker(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
                 {illiquidStocks.map(s => <option key={s.ticker} value={s.ticker}>{s.ticker.replace('.NS', '')} — Rank #{s.rank}</option>)}
               </select>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '8px', padding: '12px', background: 'var(--bg-muted)', borderRadius: '8px', marginBottom: '20px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+          <div style={{ display: 'flex', gap: '8px', padding: '10px 12px', background: 'var(--bg-muted)', borderRadius: '6px', marginBottom: '16px', fontSize: '12px', color: 'var(--text-secondary)', alignItems: 'center' }}>
             <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Comparing:</span>
-            <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{liquidTicker.replace('.NS', '')}</span>
-            <span>vs</span>
-            <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{illiquidTicker.replace('.NS', '')}</span>
+            <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{liquidTicker.replace('.NS', '')}</span>
+            <span style={{ fontSize: '10px' }}>⟷</span>
+            <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{illiquidTicker.replace('.NS', '')}</span>
           </div>
-          <button className="btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '14px', fontSize: '15px' }} onClick={() => setIsLanding(false)}>
+          <button className="btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', fontSize: '14px' }} onClick={() => setIsLanding(false)}>
             Launch Dashboard <FiArrowRight />
           </button>
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="app">

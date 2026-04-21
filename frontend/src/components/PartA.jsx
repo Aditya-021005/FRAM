@@ -121,9 +121,9 @@ export default function PartA({ illiquid, liquid }) {
             </tr>
           </thead>
           <tbody>
-            <tr style={{ background: 'var(--accent)', color: 'var(--accent-fg)' }}>
+            <tr style={{ borderLeft: '3px solid var(--accent)', background: 'var(--bg-muted)' }}>
               <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ background: 'var(--accent-fg)', color: 'var(--accent)', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px' }}>L</span>
+                <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px' }}>L</span>
                 {liquid.ticker}
               </td>
               <td>{liquid.stats.meanReturn.toFixed(4)}%</td>
@@ -131,9 +131,9 @@ export default function PartA({ illiquid, liquid }) {
               <td>₹{liquid.stats.avgTurnover.toFixed(2)}</td>
               <td>{liquid.stats.avgAmihud.toFixed(4)}</td>
             </tr>
-            <tr style={{ borderBottom: '2px solid var(--border)' }}>
+            <tr style={{ borderLeft: '3px solid var(--text-secondary)', background: 'var(--bg-muted)', borderBottom: '2px solid var(--border)' }}>
               <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ background: 'var(--bg-muted)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>
+                <span style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>
                 {illiquid.ticker}
               </td>
               <td>{illiquid.stats.meanReturn.toFixed(4)}%</td>
