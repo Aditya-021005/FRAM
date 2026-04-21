@@ -117,7 +117,16 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
   const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const meanReturn = isLiquidGroup ? -0.1 + (seed % 10)/200 : 0.01 + (seed % 10)/1000;
   return { 
-    ticker, rank, stats: { meanReturn, stdReturn: 1.5, avgRollingVol: 15 }, 
+    ticker, rank, 
+    stats: { 
+      meanReturn, 
+      stdReturn: 1.5, 
+      minReturn: meanReturn - 3, 
+      maxReturn: meanReturn + 3, 
+      avgTurnover: stockInfo.turnover, 
+      avgAmihud: isLiquidGroup ? 0.0004 : 0.007,
+      avgRollingVol: 15 
+    }, 
     vol: { histVol: 15, garchVol: 20, dailyCondVol: 1.25 }, 
     correlation: { vol_amihud: 0.2 }, 
     options: [], pnlSummary: { netDelta: 0, netGamma: 0, netVega: 0, netPremium: 0, hedgeQty: 0, hedgeCost: 0 }, 
