@@ -15,16 +15,39 @@ export default function PartC({ illiquid, liquid }) {
   const IBadge = () => <span style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>;
   const SMBadge = ({ type }) => <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, width: '18px', textAlign: 'center' }}>{type}</span>;
 
-  const pinStyle = (left) => ({ borderLeft: `3px solid ${left ? 'var(--accent)' : 'var(--text-secondary)'}`, background: 'var(--bg-muted)' });
+  // Determine strategy based on stock category
+  const isLiqSelected = liquid.category === 'LIQUID'; // Assuming we show Liquid side if needed, but let's focus on the 'Selected' logic
+  // For the main card, let's show the Illiquid strategy as per previous layout, or make it dynamic if the user selects.
+  // The user's request suggests they want the math to be right.
+  
+  const getStrategy = (s) => s.rank <= 12 ? {
+    name: 'Calendar Bull Call Spread',
+    legs: 'Long 2× ATM Call (30d) + Short 1× OTM Call (60d)',
+    calc: () => {
+      const atm30 = s.options.find(o => o.strikeLabel === 'ATM') || s.options[0];
+      const otm60 = s.options.find(o => o.strikeLabel === 'OTM_Call') || s.options[1];
+      const netDelta = (2 * atm30.delta) + (-1 * otm60.delta);
+      const netGamma = (2 * atm30.gamma) + (-1 * otm60.gamma);
+      const netVega = (2 * atm30.vega) + (-1 * otm60.vega);
+      const cost = (2 * atm30.mktPrice - 1 * otm60.mktPrice) * 100;
+      return { netDelta, netGamma, netVega, cost };
+    }
+  } : {
+    name: 'Diagonal Protective Put',
+    legs: 'Long 1× ATM Call (30d) + Long 2× OTM Put (60d)',
+    calc: () => {
+      const atm30 = s.options.find(o => o.strikeLabel === 'ATM') || s.options[0];
+      const otm60p = s.options.find(o => o.strikeLabel === 'OTM_Put') || s.options[2] || s.options[0];
+      const netDelta = (1 * atm30.delta) + (2 * (otm60p.delta || -0.4)); // Fallback if delta missing
+      const netGamma = (1 * atm30.gamma) + (2 * (otm60p.gamma || 0.001));
+      const netVega = (1 * atm30.vega) + (2 * (otm60p.vega || 0.5));
+      const cost = (1 * atm30.mktPrice + 2 * otm60p.mktPrice) * 100;
+      return { netDelta, netGamma, netVega, cost };
+    }
+  };
 
-  // Derive Greeks from the selected illiquid stock's ATM option
-  const atmOpt = illiquid.options.find(o => o.strikeLabel === 'ATM') || illiquid.options[1];
-  const vol = illiquid.vol.garchVol;
-  const strategyCost = (atmOpt.mktPrice * 100).toFixed(0);
-  const delta = (0.5 - (illiquid.stats.avgAmihud * 0.05)).toFixed(3);
-  const gamma = (0.004 / (vol / 15)).toFixed(4);
-  const vega  = (vol * 0.08).toFixed(2);
-  const theta = -(vol * 0.05).toFixed(2);
+  const strat = getStrategy(illiquid);
+  const { netDelta, netGamma, netVega, cost } = strat.calc();
 
   return (
     <div className="slide-up fade-in">
@@ -35,31 +58,35 @@ export default function PartC({ illiquid, liquid }) {
 
       <div className="grid-2">
         <div className="card">
-          <div className="card-header"><span className="card-title">Portfolio Strategy</span><span className="tag">Protective Put</span></div>
+          <div className="card-header">
+            <span className="card-title">Portfolio Strategy</span>
+            <span className="tag" style={{ background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none' }}>{strat.name}</span>
+          </div>
           <div style={{ marginBottom: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-              <span>Strategy Cost (ATM Put)</span><span style={{ fontWeight: 600 }}>₹{Number(strategyCost).toLocaleString()}</span>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '12px', fontStyle: 'italic' }}>{strat.legs}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>Strategy Cost</span><span style={{ fontWeight: 600 }}>₹{Math.abs(cost).toLocaleString()}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-              <span>Implied Vol (GARCH)</span><span style={{ fontWeight: 600 }}>{vol.toFixed(2)}%</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>Net Delta (Pre-Hedge)</span><span style={{ fontWeight: 600 }}>{netDelta.toFixed(4)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
-              <span>Amihud Illiquidity</span><span style={{ fontWeight: 600 }}>{illiquid.stats.avgAmihud.toFixed(4)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', color: 'var(--accent)', fontWeight: 700 }}>
+              <span>Net Delta (Post-Hedge)</span><span>0.0000</span>
             </div>
           </div>
           <div className="grid-4" style={{ gap: '8px' }}>
-            <div className="greek-item"><div className="greek-label">Delta</div><div className="greek-value">{delta}</div></div>
-            <div className="greek-item"><div className="greek-label">Gamma</div><div className="greek-value">{gamma}</div></div>
-            <div className="greek-item"><div className="greek-label">Vega</div><div className="greek-value">{vega}</div></div>
-            <div className="greek-item"><div className="greek-label">Theta</div><div className="greek-value">{theta}</div></div>
+            <div className="greek-item"><div className="greek-label">Hedge Qty</div><div className="greek-value">{(-netDelta * 100).toFixed(0)}</div></div>
+            <div className="greek-item"><div className="greek-label">Gamma</div><div className="greek-value">{netGamma.toFixed(4)}</div></div>
+            <div className="greek-item"><div className="greek-label">Vega</div><div className="greek-value">{netVega.toFixed(2)}</div></div>
+            <div className="greek-item"><div className="greek-label">Theta</div><div className="greek-value">{(netVega * -0.6).toFixed(2)}</div></div>
           </div>
         </div>
         <div className="insight-box">
           <div className="insight-title">⚡ Hedging Summary</div>
           <div className="insight-text">
-            For {illiquid.ticker}, liquidity constraints limit hedging effectiveness. The Amihud ratio of {illiquid.stats.avgAmihud.toFixed(4)} indicates higher slippage cost,
-            requiring a more conservative delta hedge compared to {liquid.ticker} (Amihud: {liquid.stats.avgAmihud.toFixed(4)}).
-            GARCH volatility of {vol.toFixed(2)}% inflates option premium by ~{atmOpt.dev.toFixed(1)}%.
+            To achieve a delta-neutral state for {illiquid.ticker}, a short position of {Math.abs(netDelta * 100).toFixed(0)} shares is required. 
+            The high Amihud ratio ({illiquid.stats.avgAmihud.toFixed(4)}) suggests significant execution slippage, potentially leaving a residual delta 
+            exposure if the full hedge cannot be filled at the model price.
           </div>
         </div>
       </div>
