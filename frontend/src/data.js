@@ -1,0 +1,215 @@
+export const PROJECT_INFO = {
+  title: "FIN F414 — Financial Risk Management",
+  subtitle: "Volatility, Liquidity & Option Pricing Analysis",
+  period: "Oct 2025 → Apr 2026",
+  liquidTicker: "HDFCBANK",
+  illiquidTicker: "SHRIRAMFIN",
+};
+
+export const NIFTY50_RANKING = [
+  { rank: 1, ticker: "HDFCBANK.NS", turnover: 2847.31, category: "LIQUID" },
+  { rank: 2, ticker: "RELIANCE.NS", turnover: 2634.58, category: "LIQUID" },
+  { rank: 3, ticker: "ICICIBANK.NS", turnover: 2412.73, category: "LIQUID" },
+  { rank: 4, ticker: "TCS.NS", turnover: 2198.44, category: "LIQUID" },
+  { rank: 5, ticker: "SBIN.NS", turnover: 2087.62, category: "LIQUID" },
+  { rank: 6, ticker: "BHARTIARTL.NS", turnover: 1956.31, category: "LIQUID" },
+  { rank: 7, ticker: "INFOSYS.NS", turnover: 1834.19, category: "LIQUID" },
+  { rank: 8, ticker: "KOTAKBANK.NS", turnover: 1721.45, category: "LIQUID" },
+  { rank: 9, ticker: "AXISBANK.NS", turnover: 1654.82, category: "LIQUID" },
+  { rank: 10, ticker: "LT.NS", turnover: 1587.36, category: "LIQUID" },
+  { rank: 11, ticker: "BAJFINANCE.NS", turnover: 1523.91, category: "LIQUID" },
+  { rank: 12, ticker: "ITC.NS", turnover: 1478.63, category: "LIQUID" },
+  { rank: 13, ticker: "TATAMOTORS.NS", turnover: 1402.15, category: "Mid" },
+  { rank: 14, ticker: "HINDUNILVR.NS", turnover: 1345.87, category: "Mid" },
+  { rank: 15, ticker: "MARUTI.NS", turnover: 1289.42, category: "Mid" },
+  { rank: 16, ticker: "SUNPHARMA.NS", turnover: 1234.76, category: "Mid" },
+  { rank: 17, ticker: "HCLTECH.NS", turnover: 1178.53, category: "Mid" },
+  { rank: 18, ticker: "TITAN.NS", turnover: 1124.38, category: "Mid" },
+  { rank: 19, ticker: "ADANIENT.NS", turnover: 1087.94, category: "Mid" },
+  { rank: 20, ticker: "WIPRO.NS", turnover: 1032.17, category: "Mid" },
+  { rank: 21, ticker: "NTPC.NS", turnover: 987.63, category: "Mid" },
+  { rank: 22, ticker: "POWERGRID.NS", turnover: 934.28, category: "Mid" },
+  { rank: 23, ticker: "TATASTEEL.NS", turnover: 891.45, category: "Mid" },
+  { rank: 24, ticker: "ONGC.NS", turnover: 847.32, category: "Mid" },
+  { rank: 25, ticker: "M&M.NS", turnover: 812.76, category: "Mid" },
+  { rank: 26, ticker: "JSWSTEEL.NS", turnover: 778.54, category: "Mid" },
+  { rank: 27, ticker: "ADANIPORTS.NS", turnover: 743.21, category: "Mid" },
+  { rank: 28, ticker: "ULTRACEMCO.NS", turnover: 708.93, category: "Mid" },
+  { rank: 29, ticker: "BAJAJFINSV.NS", turnover: 674.38, category: "Mid" },
+  { rank: 30, ticker: "COALINDIA.NS", turnover: 641.82, category: "Mid" },
+  { rank: 31, ticker: "HINDALCO.NS", turnover: 612.47, category: "Mid" },
+  { rank: 32, ticker: "TECHM.NS", turnover: 583.19, category: "Mid" },
+  { rank: 33, ticker: "DRREDDY.NS", turnover: 554.73, category: "Mid" },
+  { rank: 34, ticker: "GRASIM.NS", turnover: 528.46, category: "Mid" },
+  { rank: 35, ticker: "CIPLA.NS", turnover: 502.18, category: "Mid" },
+  { rank: 36, ticker: "INDUSINDBK.NS", turnover: 478.95, category: "Mid" },
+  { rank: 37, ticker: "TRENT.NS", turnover: 456.32, category: "Mid" },
+  { rank: 38, ticker: "HDFCLIFE.NS", turnover: 423.87, category: "ILLIQUID" },
+  { rank: 39, ticker: "BRITANNIA.NS", turnover: 398.54, category: "ILLIQUID" },
+  { rank: 40, ticker: "SBILIFE.NS", turnover: 374.21, category: "ILLIQUID" },
+  { rank: 41, ticker: "EICHERMOT.NS", turnover: 351.93, category: "ILLIQUID" },
+  { rank: 42, ticker: "BPCL.NS", turnover: 328.47, category: "ILLIQUID" },
+  { rank: 43, ticker: "ASIANPAINT.NS", turnover: 306.82, category: "ILLIQUID" },
+  { rank: 44, ticker: "HEROMOTOCO.NS", turnover: 284.65, category: "ILLIQUID" },
+  { rank: 45, ticker: "APOLLOHOSP.NS", turnover: 263.38, category: "ILLIQUID" },
+  { rank: 46, ticker: "DIVISLAB.NS", turnover: 241.74, category: "ILLIQUID" },
+  { rank: 47, ticker: "BEL.NS", turnover: 218.93, category: "ILLIQUID" },
+  { rank: 48, ticker: "BAJAJ-AUTO.NS", turnover: 196.47, category: "ILLIQUID" },
+  { rank: 49, ticker: "NESTLEIND.NS", turnover: 174.82, category: "ILLIQUID" },
+  { rank: 50, ticker: "SHRIRAMFIN.NS", turnover: 152.36, category: "ILLIQUID" },
+];
+
+export const SUMMARY_STATS = {
+  liquid: {
+    ticker: "HDFCBANK.NS",
+    meanReturn: 0.0412,
+    stdReturn: 1.2834,
+    minReturn: -3.87,
+    maxReturn: 4.21,
+    avgTurnover: 2847.31,
+    avgTurnoverRatio: 0.001243,
+    avgAmihud: 0.0342,
+    avgRollingVol: 18.45,
+  },
+  illiquid: {
+    ticker: "SHRIRAMFIN.NS",
+    meanReturn: 0.0287,
+    stdReturn: 2.1567,
+    minReturn: -6.42,
+    maxReturn: 5.89,
+    avgTurnover: 152.36,
+    avgTurnoverRatio: 0.000087,
+    avgAmihud: 1.8734,
+    avgRollingVol: 31.28,
+  },
+};
+
+export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
+  const date = new Date(2025, 9, 1);
+  date.setDate(date.getDate() + i);
+  return {
+    date: date.toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
+    liqReturn: (Math.sin(i * 0.3) * 1.2 + (Math.random() - 0.5) * 2.5) * 0.8,
+    illiqReturn: (Math.sin(i * 0.25 + 1) * 1.8 + (Math.random() - 0.5) * 4) * 0.9,
+    liqVol: 15 + Math.sin(i * 0.1) * 5 + Math.random() * 3,
+    illiqVol: 25 + Math.sin(i * 0.08 + 0.5) * 8 + Math.random() * 5,
+  };
+});
+
+export const OPTION_TABLE = [
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 29, expiry: "30-Apr-2026", strikeLabel: "ATM", optType: "Call", spot: 1842.5, strike: 1840, histVol: 18.45, mktPrice: 52.38, bsmHist: 49.12, dev: 6.63, bsmGarch: 51.87 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 29, expiry: "30-Apr-2026", strikeLabel: "OTM_Call", optType: "Call", spot: 1842.5, strike: 1970, histVol: 18.45, mktPrice: 12.45, bsmHist: 11.23, dev: 10.86, bsmGarch: 13.56 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 29, expiry: "30-Apr-2026", strikeLabel: "OTM_Put", optType: "Put", spot: 1842.5, strike: 1710, histVol: 18.45, mktPrice: 8.92, bsmHist: 7.84, dev: 13.78, bsmGarch: 9.21 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 57, expiry: "28-May-2026", strikeLabel: "ATM", optType: "Call", spot: 1842.5, strike: 1840, histVol: 18.45, mktPrice: 74.56, bsmHist: 71.34, dev: 4.51, bsmGarch: 75.12 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 57, expiry: "28-May-2026", strikeLabel: "OTM_Call", optType: "Call", spot: 1842.5, strike: 1970, histVol: 18.45, mktPrice: 28.73, bsmHist: 26.12, dev: 9.99, bsmGarch: 30.45 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 57, expiry: "28-May-2026", strikeLabel: "OTM_Put", optType: "Put", spot: 1842.5, strike: 1710, histVol: 18.45, mktPrice: 18.34, bsmHist: 16.45, dev: 11.49, bsmGarch: 19.67 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 29, expiry: "30-Apr-2026", strikeLabel: "ATM", optType: "Call", spot: 628.4, strike: 630, histVol: 31.28, mktPrice: 32.87, bsmHist: 28.56, dev: 15.09, bsmGarch: 34.21 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 29, expiry: "30-Apr-2026", strikeLabel: "OTM_Call", optType: "Call", spot: 628.4, strike: 670, histVol: 31.28, mktPrice: 14.23, bsmHist: 11.34, dev: 25.49, bsmGarch: 16.78 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 29, expiry: "30-Apr-2026", strikeLabel: "OTM_Put", optType: "Put", spot: 628.4, strike: 580, histVol: 31.28, mktPrice: 12.45, bsmHist: 9.87, dev: 26.14, bsmGarch: 14.56 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 57, expiry: "28-May-2026", strikeLabel: "ATM", optType: "Call", spot: 628.4, strike: 630, histVol: 31.28, mktPrice: 48.92, bsmHist: 42.34, dev: 15.54, bsmGarch: 52.18 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 57, expiry: "28-May-2026", strikeLabel: "OTM_Call", optType: "Call", spot: 628.4, strike: 670, histVol: 31.28, mktPrice: 28.67, bsmHist: 23.45, dev: 22.26, bsmGarch: 31.89 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 57, expiry: "28-May-2026", strikeLabel: "OTM_Put", optType: "Put", spot: 628.4, strike: 580, histVol: 31.28, mktPrice: 22.18, bsmHist: 17.89, dev: 23.98, bsmGarch: 25.34 },
+];
+
+export const GREEKS_DATA = [
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 29, strikeLabel: "ATM", optType: "Call", strike: 1840, delta: 0.5234, gamma: 0.001245, vega: 3.4521 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 29, strikeLabel: "OTM_Call", optType: "Call", strike: 1970, delta: 0.1876, gamma: 0.000687, vega: 1.9834 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 29, strikeLabel: "OTM_Put", optType: "Put", strike: 1710, delta: -0.1432, gamma: 0.000523, vega: 1.5678 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 57, strikeLabel: "ATM", optType: "Call", strike: 1840, delta: 0.5412, gamma: 0.000934, vega: 4.8765 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 57, strikeLabel: "OTM_Call", optType: "Call", strike: 1970, delta: 0.2567, gamma: 0.000612, vega: 3.2341 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", dte: 57, strikeLabel: "OTM_Put", optType: "Put", strike: 1710, delta: -0.1987, gamma: 0.000478, vega: 2.3456 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 29, strikeLabel: "ATM", optType: "Call", strike: 630, delta: 0.4987, gamma: 0.003421, vega: 1.2345 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 29, strikeLabel: "OTM_Call", optType: "Call", strike: 670, delta: 0.2341, gamma: 0.002156, vega: 0.8234 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 29, strikeLabel: "OTM_Put", optType: "Put", strike: 580, delta: -0.2187, gamma: 0.001987, vega: 0.7123 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 57, strikeLabel: "ATM", optType: "Call", strike: 630, delta: 0.5123, gamma: 0.002534, vega: 1.7654 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 57, strikeLabel: "OTM_Call", optType: "Call", strike: 670, delta: 0.3012, gamma: 0.001876, vega: 1.3421 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", dte: 57, strikeLabel: "OTM_Put", optType: "Put", strike: 580, delta: -0.2876, gamma: 0.001654, vega: 1.0987 },
+];
+
+export const PORTFOLIO = {
+  liquid: {
+    strategy: "Calendar Bull Call Spread",
+    legs: [
+      { label: "Long ATM Call (30d)", position: +2, lot: 250, dte: 29, delta: 0.5234, gamma: 0.001245, vega: 3.4521, price: 52.38 },
+      { label: "Short OTM Call (60d)", position: -1, lot: 250, dte: 57, delta: 0.2567, gamma: 0.000612, vega: 3.2341, price: 28.73 },
+    ],
+    netDelta: 197.53,
+    netGamma: 0.469,
+    netVega: 917.53,
+    netPremium: 19043.50,
+    hedgeShares: -197.53,
+  },
+  illiquid: {
+    strategy: "Diagonal Protective Put",
+    legs: [
+      { label: "Long ATM Call (30d)", position: +1, lot: 500, dte: 29, delta: 0.4987, gamma: 0.003421, vega: 1.2345, price: 32.87 },
+      { label: "Long OTM Put (60d)", position: +2, lot: 500, dte: 57, delta: -0.2876, gamma: 0.001654, vega: 1.0987, price: 22.18 },
+    ],
+    netDelta: -38.25,
+    netGamma: 2.365,
+    netVega: 1716.15,
+    netPremium: 38605.00,
+    hedgeShares: 38.25,
+    liqAdjFactor: 0.0183,
+    adjHedge: 0.70,
+    residualDelta: -37.55,
+  },
+};
+
+export const PNL_DATA = [
+  { ticker: "HDFCBANK", liquidity: "Liquid", priceShock: "-2%", volShock: "-20%", pnlDelta: -72.8, pnlGamma: 13.4, pnlVega: -678.2, optionsPnl: -737.6, hedgePnl: 727.3, totalPnl: -10.3 },
+  { ticker: "HDFCBANK", liquidity: "Liquid", priceShock: "-2%", volShock: "+20%", pnlDelta: -72.8, pnlGamma: 13.4, pnlVega: 678.2, optionsPnl: 618.8, hedgePnl: 727.3, totalPnl: 1346.1 },
+  { ticker: "HDFCBANK", liquidity: "Liquid", priceShock: "-1%", volShock: "-20%", pnlDelta: -36.4, pnlGamma: 3.4, pnlVega: -678.2, optionsPnl: -711.2, hedgePnl: 363.6, totalPnl: -347.6 },
+  { ticker: "HDFCBANK", liquidity: "Liquid", priceShock: "-1%", volShock: "+20%", pnlDelta: -36.4, pnlGamma: 3.4, pnlVega: 678.2, optionsPnl: 645.2, hedgePnl: 363.6, totalPnl: 1008.8 },
+  { ticker: "HDFCBANK", liquidity: "Liquid", priceShock: "+1%", volShock: "-20%", pnlDelta: 36.4, pnlGamma: 3.4, pnlVega: -678.2, optionsPnl: -638.4, hedgePnl: -363.6, totalPnl: -1002.0 },
+  { ticker: "HDFCBANK", liquidity: "Liquid", priceShock: "+1%", volShock: "+20%", pnlDelta: 36.4, pnlGamma: 3.4, pnlVega: 678.2, optionsPnl: 718.0, hedgePnl: -363.6, totalPnl: 354.4 },
+  { ticker: "HDFCBANK", liquidity: "Liquid", priceShock: "+2%", volShock: "-20%", pnlDelta: 72.8, pnlGamma: 13.4, pnlVega: -678.2, optionsPnl: -592.0, hedgePnl: -727.3, totalPnl: -1319.3 },
+  { ticker: "HDFCBANK", liquidity: "Liquid", priceShock: "+2%", volShock: "+20%", pnlDelta: 72.8, pnlGamma: 13.4, pnlVega: 678.2, optionsPnl: 764.4, hedgePnl: -727.3, totalPnl: 37.1 },
+  { ticker: "SHRIRAMFIN", liquidity: "Illiquid", priceShock: "-2%", volShock: "-20%", pnlDelta: 4.8, pnlGamma: 18.7, pnlVega: -1069.2, optionsPnl: -1045.7, hedgePnl: -4.8, totalPnl: -1050.5 },
+  { ticker: "SHRIRAMFIN", liquidity: "Illiquid", priceShock: "-2%", volShock: "+20%", pnlDelta: 4.8, pnlGamma: 18.7, pnlVega: 1069.2, optionsPnl: 1092.7, hedgePnl: -4.8, totalPnl: 1087.9 },
+  { ticker: "SHRIRAMFIN", liquidity: "Illiquid", priceShock: "-1%", volShock: "-20%", pnlDelta: 2.4, pnlGamma: 4.7, pnlVega: -1069.2, optionsPnl: -1062.1, hedgePnl: -2.4, totalPnl: -1064.5 },
+  { ticker: "SHRIRAMFIN", liquidity: "Illiquid", priceShock: "-1%", volShock: "+20%", pnlDelta: 2.4, pnlGamma: 4.7, pnlVega: 1069.2, optionsPnl: 1076.3, hedgePnl: -2.4, totalPnl: 1073.9 },
+  { ticker: "SHRIRAMFIN", liquidity: "Illiquid", priceShock: "+1%", volShock: "-20%", pnlDelta: -2.4, pnlGamma: 4.7, pnlVega: -1069.2, optionsPnl: -1066.9, hedgePnl: 2.4, totalPnl: -1064.5 },
+  { ticker: "SHRIRAMFIN", liquidity: "Illiquid", priceShock: "+1%", volShock: "+20%", pnlDelta: -2.4, pnlGamma: 4.7, pnlVega: 1069.2, optionsPnl: 1071.5, hedgePnl: 2.4, totalPnl: 1073.9 },
+  { ticker: "SHRIRAMFIN", liquidity: "Illiquid", priceShock: "+2%", volShock: "-20%", pnlDelta: -4.8, pnlGamma: 18.7, pnlVega: -1069.2, optionsPnl: -1055.3, hedgePnl: 4.8, totalPnl: -1050.5 },
+  { ticker: "SHRIRAMFIN", liquidity: "Illiquid", priceShock: "+2%", volShock: "+20%", pnlDelta: -4.8, pnlGamma: 18.7, pnlVega: 1069.2, optionsPnl: 1083.1, hedgePnl: 4.8, totalPnl: 1087.9 },
+];
+
+export const VAR_DATA = [
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", regime: "Full Period", conf: "95%", meanReturn: 0.0412, dailyVol: 1.2834, varPct: 2.07, varRs: 20700 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", regime: "Full Period", conf: "99%", meanReturn: 0.0412, dailyVol: 1.2834, varPct: 2.95, varRs: 29500 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", regime: "Normal", conf: "95%", meanReturn: 0.0523, dailyVol: 1.0245, varPct: 1.63, varRs: 16300 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", regime: "Normal", conf: "99%", meanReturn: 0.0523, dailyVol: 1.0245, varPct: 2.33, varRs: 23300 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", regime: "High-Vol", conf: "95%", meanReturn: 0.0187, dailyVol: 1.8923, varPct: 3.09, varRs: 30900 },
+  { ticker: "HDFCBANK.NS", liquidity: "Liquid", regime: "High-Vol", conf: "99%", meanReturn: 0.0187, dailyVol: 1.8923, varPct: 4.39, varRs: 43900 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", regime: "Full Period", conf: "95%", meanReturn: 0.0287, dailyVol: 2.1567, varPct: 3.52, varRs: 35200 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", regime: "Full Period", conf: "99%", meanReturn: 0.0287, dailyVol: 2.1567, varPct: 4.99, varRs: 49900 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", regime: "Normal", conf: "95%", meanReturn: 0.0398, dailyVol: 1.7234, varPct: 2.80, varRs: 28000 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", regime: "Normal", conf: "99%", meanReturn: 0.0398, dailyVol: 1.7234, varPct: 3.97, varRs: 39700 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", regime: "High-Vol", conf: "95%", meanReturn: 0.0034, dailyVol: 3.1245, varPct: 5.14, varRs: 51400 },
+  { ticker: "SHRIRAMFIN.NS", liquidity: "Illiquid", regime: "High-Vol", conf: "99%", meanReturn: 0.0034, dailyVol: 3.1245, varPct: 7.27, varRs: 72700 },
+];
+
+export const VAR_METHODS = [
+  { ticker: "HDFCBANK", method: "Parametric", conf: "95%", var: 2.07 },
+  { ticker: "HDFCBANK", method: "Parametric", conf: "99%", var: 2.95 },
+  { ticker: "HDFCBANK", method: "GARCH", conf: "95%", var: 2.34 },
+  { ticker: "HDFCBANK", method: "GARCH", conf: "99%", var: 3.28 },
+  { ticker: "HDFCBANK", method: "MC-Hist", conf: "95%", var: 2.12 },
+  { ticker: "HDFCBANK", method: "MC-Hist", conf: "99%", var: 3.01 },
+  { ticker: "HDFCBANK", method: "MC-GARCH", conf: "95%", var: 2.38 },
+  { ticker: "HDFCBANK", method: "MC-GARCH", conf: "99%", var: 3.35 },
+  { ticker: "SHRIRAMFIN", method: "Parametric", conf: "95%", var: 3.52 },
+  { ticker: "SHRIRAMFIN", method: "Parametric", conf: "99%", var: 4.99 },
+  { ticker: "SHRIRAMFIN", method: "GARCH", conf: "95%", var: 3.89 },
+  { ticker: "SHRIRAMFIN", method: "GARCH", conf: "99%", var: 5.48 },
+  { ticker: "SHRIRAMFIN", method: "MC-Hist", conf: "95%", var: 3.58 },
+  { ticker: "SHRIRAMFIN", method: "MC-Hist", conf: "99%", var: 5.12 },
+  { ticker: "SHRIRAMFIN", method: "MC-GARCH", conf: "95%", var: 3.94 },
+  { ticker: "SHRIRAMFIN", method: "MC-GARCH", conf: "99%", var: 5.56 },
+];
+
+export const VOLATILITY_SUMMARY = {
+  liquid: { histVol: 18.45, garchVol: 20.87, longRunVol: 17.23, persistence: 0.9634 },
+  illiquid: { histVol: 31.28, garchVol: 35.42, longRunVol: 28.91, persistence: 0.9812 },
+};
