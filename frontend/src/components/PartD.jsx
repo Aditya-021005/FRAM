@@ -1,117 +1,232 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
-import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData, getLiquidData } from '../data';
+import { 
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
+  CartesianGrid, Legend, Cell, LineChart, Line, AreaChart, Area, ComposedChart 
+} from 'recharts';
+import { HISTOGRAM_DATA, RETURNS_DATA } from '../data';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'var(--tooltip-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12, boxShadow: 'var(--shadow-sm)' }}>
+    <div style={{ background: 'var(--tooltip-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 11, boxShadow: 'var(--shadow-sm)' }}>
       <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
       {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}</p>
+        <p key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(4) : p.value}</p>
       ))}
     </div>
   );
 };
 
 export default function PartD({ illiquid, liquid }) {
-  const liqStocks = NIFTY50_RANKING.filter(s => s.category === 'LIQUID');
-  const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
+
+  const getRegimeData = (stock) => {
+    const regimes = ["Full Period", "Normal", "High-Vol"];
+    return regimes.map(r => ({
+      name: r,
+      'VaR 95%': stock.varAnalysis.find(v => v.regime === r && v.conf === '95%')?.varPct,
+      'VaR 99%': stock.varAnalysis.find(v => v.regime === r && v.conf === '99%')?.varPct,
+    }));
+  };
+
+  const getMethodData = () => {
+    const methods = ["Parametric-Normal", "GARCH(1,1)", "MC-Historical", "MC-GARCH"];
+    return methods.map(m => ({
+      name: m,
+      'HDFCBANK 95%': liquid.varMethods.find(v => v.method === m)?.c95,
+      'HDFCBANK 99%': liquid.varMethods.find(v => v.method === m)?.c99,
+      'NESTLEIND 95%': illiquid.varMethods.find(v => v.method === m)?.c95,
+      'NESTLEIND 99%': illiquid.varMethods.find(v => v.method === m)?.c99,
+    }));
+  };
+
+  const HistogramView = ({ dataKey, title, var95, var99, color }) => (
+    <div className="chart-container">
+      <div className="chart-title">{title}</div>
+      <ResponsiveContainer width="100%" height={200}>
+        <ComposedChart data={HISTOGRAM_DATA}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+          <XAxis dataKey="bi" tick={{ fontSize: 9 }} label={{ value: 'Daily Log Return (%)', position: 'bottom', fontSize: 10, offset: 0 }} />
+          <YAxis tick={{ fontSize: 9 }} label={{ value: 'Density', angle: -90, position: 'insideLeft', fontSize: 10 }} />
+          <Tooltip content={<CustomTooltip />} />
+          <Bar dataKey={dataKey} name="Empirical Returns" fill={color} fillOpacity={0.6} barSize={12} />
+          <Line type="monotone" dataKey={dataKey} stroke="#000" strokeWidth={2} dot={false} name="Fitted Normal" />
+          <line x1={`${50 + (var95 * -10)}%`} x2={`${50 + (var95 * -10)}%`} y1="0" y2="100%" stroke="#3b82f6" strokeDasharray="5 5" />
+          <line x1={`${50 + (var99 * -10)}%`} x2={`${50 + (var99 * -10)}%`} y1="0" y2="100%" stroke="#dc2626" strokeDasharray="5 5" />
+        </ComposedChart>
+      </ResponsiveContainer>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', fontSize: '10px', marginTop: '8px' }}>
+         <span style={{ color: '#3b82f6' }}>-- VaR 95% = {var95}%</span>
+         <span style={{ color: '#dc2626' }}>-- VaR 99% = {var99}%</span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="slide-up fade-in">
       <div className="section-header">
-        <h2 className="section-title">Value at Risk (VaR) Analysis</h2>
-        <p className="section-subtitle">Comparing risk across regimes for {illiquid.ticker}. Confidence level at 99%.</p>
+        <h2 className="section-title">Value at Risk (VaR) & Stress Analysis</h2>
+        <p className="section-subtitle">Stressed risk assessment comparing parametric methods with conditional volatility and Monte Carlo simulations.</p>
       </div>
 
-      <div className="grid-2" style={{ marginBottom: 32 }}>
+      {/* Row 1: Distribution */}
+      <div className="grid-2" style={{ gap: '24px', marginBottom: '24px' }}>
+        <HistogramView dataKey="hdfc" title={`Return Distribution — ${liquid.ticker}`} var95={2.47} var99={3.37} color="#3b82f6" />
+        <HistogramView dataKey="nestle" title={`Return Distribution — ${illiquid.ticker}`} var95={1.80} var99={2.51} color="#f87171" />
+      </div>
+
+      {/* Row 2: Regime Comparison */}
+      <div className="grid-2" style={{ gap: '24px', marginBottom: '24px' }}>
         <div className="chart-container">
-          <div className="chart-title">99% 1-Day VaR (%) by Regime — {illiquid.ticker}</div>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={illiquid.var}>
+          <div className="chart-title">1-Day VaR by Volatility Regime — {liquid.ticker}</div>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={getRegimeData(liquid)}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-              <XAxis dataKey="regime" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip cursor={{ fill: 'var(--bg-muted)' }} />
-              <Bar dataKey="varPct" name="VaR %" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} label={{ value: 'VaR (%)', angle: -90, position: 'insideLeft', fontSize: 10 }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Bar dataKey="VaR 95%" fill="#3b82f6" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="VaR 99%" fill="#f87171" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="insight-box" style={{ marginTop: 0 }}>
-          <div className="insight-title">💡 Risk Exposure</div>
-          <div className="insight-text">
-            {illiquid.ticker} shows elevated VaR levels. Under High-Volatility regimes, the potential 1-day loss 
-            is significantly higher than in normal regimes, highlighting the impact of kurtosis in thin markets.
-          </div>
+        <div className="chart-container">
+          <div className="chart-title">1-Day VaR by Volatility Regime — {illiquid.ticker}</div>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={getRegimeData(illiquid)}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} label={{ value: 'VaR (%)', angle: -90, position: 'insideLeft', fontSize: 10 }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Bar dataKey="VaR 95%" fill="#3b82f6" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="VaR 99%" fill="#f87171" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="table-container">
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          Risk Summary Matrix (All Securities)
-          <div style={{ display: 'flex', gap: '8px', fontSize: '12px', fontWeight: 400, color: 'var(--text-secondary)' }}>
-            <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>L</span> Liquid
-            <span style={{ background: 'var(--bg-muted)', color: 'var(--text-primary)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', fontWeight: 600 }}>I</span> Illiquid
-          </div>
-        </div>
+      {/* Row 3: Method Comparison */}
+      <div className="chart-container" style={{ marginBottom: '24px' }}>
+        <div className="chart-title">VaR Comparison Across Methods (Full Period) — 95% & 99% Confidence</div>
+        <ResponsiveContainer width="100%" height={250}>
+          <BarChart data={getMethodData()}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+            <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+            <YAxis tick={{ fontSize: 10 }} label={{ value: 'VaR (%)', angle: -90, position: 'insideLeft', fontSize: 10 }} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 10 }} />
+            <Bar dataKey="HDFCBANK 95%" fill="#3b82f6" fillOpacity={0.7} />
+            <Bar dataKey="NESTLEIND 95%" fill="#f87171" fillOpacity={0.7} hatch />
+            <Bar dataKey="HDFCBANK 99%" fill="#1d4ed8" />
+            <Bar dataKey="NESTLEIND 99%" fill="#dc2626" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Row 4: Rolling VaR */}
+      <div className="chart-container" style={{ marginBottom: '40px' }}>
+        <div className="chart-title">Rolling 20-Day Parametric VaR (99%) — Full Period</div>
+        <ResponsiveContainer width="100%" height={240}>
+          <AreaChart data={RETURNS_DATA}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+            <XAxis dataKey="date" tick={{ fontSize: 8 }} />
+            <YAxis tick={{ fontSize: 9 }} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 10 }} />
+            <Area type="monotone" dataKey="hdfcVaR" name={`${liquid.ticker} VaR 99%`} stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} />
+            <Area type="monotone" dataKey="nestleVaR" name={`${illiquid.ticker} VaR 99%`} stroke="#dc2626" fill="#dc2626" fillOpacity={0.1} />
+            <Area dataKey="isHighVolLiq" name="High-Vol Regime (Liq)" fill="#3b82f6" fillOpacity={0.05} stroke="none" />
+            <Area dataKey="isHighVolIlliq" name="High-Vol Regime (Illiq)" fill="#dc2626" fillOpacity={0.05} stroke="none" />
+          </AreaChart>
+        </ResponsiveContainer>
+        <div style={{ fontSize: '10px', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '8px' }}>Shaded Areas = High Volatility Clusters (Top 25% rolling vol days)</div>
+      </div>
+
+      {/* Tables */}
+      <div className="table-container" style={{ marginBottom: '24px' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>Parametric VaR Matrix (95% & 99% Confidence)</div>
         <table>
           <thead>
             <tr>
-              <th>Security</th>
-              <th>Full Period VaR (99%)</th>
-              <th>High-Vol VaR (99%)</th>
-              <th>Capital at Risk (10L)</th>
+              <th>Ticker</th>
+              <th>Regime</th>
+              <th>Mean (%)</th>
+              <th>Daily Vol (%)</th>
+              <th>VaR (%)</th>
+              <th>VaR (₹ on 10L)</th>
             </tr>
           </thead>
           <tbody>
-            <tr style={{ borderLeft: '3px solid var(--accent)', background: 'var(--bg-muted)' }}>
-              <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px' }}>L</span>
-                {liquid.ticker}
-              </td>
-              <td>{liquid.var[0].varPct.toFixed(2)}%</td>
-              <td>{liquid.var[1].varPct.toFixed(2)}%</td>
-              <td>₹{liquid.var[0].varRs.toLocaleString()}</td>
+            {liquid.varAnalysis.map((v, i) => (
+              <tr key={`l-${i}`} style={{ background: i < 2 ? 'rgba(59, 130, 246, 0.03)' : 'transparent' }}>
+                <td>{liquid.ticker}</td>
+                <td>{v.regime} ({v.conf})</td>
+                <td>{v.mean.toFixed(4)}%</td>
+                <td>{v.vol.toFixed(4)}%</td>
+                <td>{v.varPct.toFixed(4)}%</td>
+                <td style={{ fontWeight: 600 }}>₹{v.varRs.toLocaleString()}</td>
+              </tr>
+            ))}
+            {illiquid.varAnalysis.map((v, i) => (
+              <tr key={`i-${i}`} style={{ background: i < 2 ? 'rgba(248, 113, 113, 0.03)' : 'transparent' }}>
+                <td>{illiquid.ticker}</td>
+                <td>{v.regime} ({v.conf})</td>
+                <td>{v.mean.toFixed(4)}%</td>
+                <td>{v.vol.toFixed(4)}%</td>
+                <td>{v.varPct.toFixed(4)}%</td>
+                <td style={{ fontWeight: 600 }}>₹{v.varRs.toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="table-container">
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>GARCH & Monte Carlo VaR Comparison</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Method</th>
+              <th>Cond Vol (%)</th>
+              <th>VaR 95% (%)</th>
+              <th>VaR 99% (%)</th>
+              <th>Capital at Risk (99%)</th>
             </tr>
-            <tr style={{ borderLeft: '3px solid var(--text-secondary)', background: 'var(--bg-muted)', borderBottom: '2px solid var(--border)' }}>
-              <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>
-                {illiquid.ticker}
-              </td>
-              <td>{illiquid.var[0].varPct.toFixed(2)}%</td>
-              <td>{illiquid.var[1].varPct.toFixed(2)}%</td>
-              <td>₹{illiquid.var[0].varRs.toLocaleString()}</td>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{liquid.ticker}</td>
+              <td style={{ fontWeight: 600 }}>GARCH(1,1)</td>
+              <td>{liquid.vol.dailyCondVol.toFixed(4)}%</td>
+              <td>{liquid.varMethods[1].c95.toFixed(4)}%</td>
+              <td>{liquid.varMethods[1].c99.toFixed(4)}%</td>
+              <td>₹69,454</td>
             </tr>
-            {liqStocks.map(s => {
-              if (s.ticker === liquid.ticker) return null;
-              const data = getLiquidData(s.ticker);
-              return (
-                <tr key={s.ticker}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, width: '18px', textAlign: 'center' }}>L</span>
-                    {s.ticker}
-                  </td>
-                  <td>{data.var[0].varPct.toFixed(2)}%</td>
-                  <td>{data.var[1].varPct.toFixed(2)}%</td>
-                  <td>₹{data.var[0].varRs.toLocaleString()}</td>
-                </tr>
-              );
-            })}
-            {illiquidStocks.map(s => {
-              if (s.ticker === illiquid.ticker) return null;
-              const data = getIlliquidData(s.ticker);
-              return (
-                <tr key={s.ticker}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, width: '18px', textAlign: 'center' }}>I</span>
-                    {s.ticker}
-                  </td>
-                  <td>{data.var[0].varPct.toFixed(2)}%</td>
-                  <td>{data.var[1].varPct.toFixed(2)}%</td>
-                  <td>₹{data.var[0].varRs.toLocaleString()}</td>
-                </tr>
-              );
-            })}
+            <tr>
+              <td>{illiquid.ticker}</td>
+              <td style={{ fontWeight: 600 }}>GARCH(1,1)</td>
+              <td>{illiquid.vol.dailyCondVol.toFixed(4)}%</td>
+              <td>{illiquid.varMethods[1].c95.toFixed(4)}%</td>
+              <td>{illiquid.varMethods[1].c99.toFixed(4)}%</td>
+              <td>₹31,637</td>
+            </tr>
+            <tr style={{ borderTop: '1px solid var(--border)' }}>
+              <td>{liquid.ticker}</td>
+              <td>MC-Historical</td>
+              <td>-</td>
+              <td>{liquid.varMethods[2].c95.toFixed(4)}%</td>
+              <td>{liquid.varMethods[2].c99.toFixed(4)}%</td>
+              <td>₹33,571</td>
+            </tr>
+            <tr>
+              <td>{illiquid.ticker}</td>
+              <td>MC-Historical</td>
+              <td>-</td>
+              <td>{illiquid.varMethods[2].c95.toFixed(4)}%</td>
+              <td>{illiquid.varMethods[2].c99.toFixed(4)}%</td>
+              <td>₹25,086</td>
+            </tr>
           </tbody>
         </table>
       </div>

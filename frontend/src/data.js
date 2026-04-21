@@ -24,7 +24,7 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
     return {
       ticker, rank,
       stats: { meanReturn: -0.2401, stdReturn: 1.5375, minReturn: -5.4667, maxReturn: 5.5552, avgTurnover: 3034.01, avgAmihud: 0.0004, avgRollingVol: 18.82 },
-      vol: { histVol: 14.85, garchVol: 45.29, longRunVol: 18.58, persistence: 1.0000 },
+      vol: { histVol: 14.85, garchVol: 45.29, longRunVol: 18.58, persistence: 1.0000, dailyCondVol: 2.8533 },
       correlation: { vol_amihud: 0.2379 },
       spot: 731.55,
       options: [
@@ -50,9 +50,19 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
         { shock: "+2%", vShock: "-20%", total: -117.76, d: 3509.61, g: 522.78, v: -640.54, h: -3509.61 },
         { shock: "+2%", vShock: "+20%", total: 1163.32, d: 3509.61, g: 522.78, v: 640.54, h: -3509.61 }
       ],
-      var: [
-        { regime: "Full Period", varPct: 2.15, varRs: 21500 },
-        { regime: "High Vol", varPct: 3.42, varRs: 34200 }
+      varAnalysis: [
+        { regime: "Full Period", conf: "95%", mean: -0.3077, vol: 1.3163, varPct: 2.4727, varRs: 24727.08 },
+        { regime: "Full Period", conf: "99%", mean: -0.3077, vol: 1.3163, varPct: 3.3697, varRs: 33697.28 },
+        { regime: "Normal", conf: "95%", mean: -0.1479, vol: 0.8165, varPct: 1.4910, varRs: 14909.52 },
+        { regime: "Normal", conf: "99%", mean: -0.1479, vol: 0.8165, varPct: 2.0474, varRs: 20473.88 },
+        { regime: "High-Vol", conf: "95%", mean: -0.7684, vol: 2.1586, varPct: 4.3190, varRs: 43189.54 },
+        { regime: "High-Vol", conf: "99%", mean: -0.7684, vol: 2.1586, varPct: 5.7900, varRs: 57900.14 }
+      ],
+      varMethods: [
+        { method: "Parametric-Normal", c95: 2.4727, c99: 3.3697 },
+        { method: "GARCH(1,1)", c95: 5.0009, c99: 6.9454 },
+        { method: "MC-Historical", c95: 2.4709, c99: 3.3572 },
+        { method: "MC-GARCH", c95: 4.9963, c99: 7.0226 }
       ]
     };
   }
@@ -60,7 +70,7 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
     return {
       ticker, rank,
       stats: { meanReturn: 0.0111, stdReturn: 1.1604, minReturn: -2.7249, maxReturn: 3.3969, avgTurnover: 138.58, avgAmihud: 0.007, avgRollingVol: 16.57 },
-      vol: { histVol: 16.33, garchVol: 21.05, longRunVol: 8.88, persistence: 1.0000 },
+      vol: { histVol: 16.33, garchVol: 21.05, longRunVol: 8.88, persistence: 1.0000, dailyCondVol: 1.3258 },
       correlation: { vol_amihud: 0.1763 },
       spot: 1174.80,
       options: [
@@ -86,9 +96,19 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
         { shock: "+2%", vShock: "-20%", total: -3235.28, d: 5678.98, g: 1577.93, v: -4813.21, h: -5678.98 },
         { shock: "+2%", vShock: "+20%", total: 6391.14, d: 5678.98, g: 1577.93, v: 4813.21, h: -5678.98 }
       ],
-      var: [
-        { regime: "Full Period", varPct: 1.85, varRs: 18500 },
-        { regime: "High Vol", varPct: 2.95, varRs: 29500 }
+      varAnalysis: [
+        { regime: "Full Period", conf: "95%", mean: -0.0795, vol: 1.0462, varPct: 1.8003, varRs: 18002.73 },
+        { regime: "Full Period", conf: "99%", mean: -0.0795, vol: 1.0462, varPct: 2.5132, varRs: 25132.20 },
+        { regime: "Normal", conf: "95%", mean: -0.1117, vol: 0.9823, varPct: 1.7274, varRs: 17274.10 },
+        { regime: "Normal", conf: "99%", mean: -0.1117, vol: 0.9823, varPct: 2.3968, varRs: 23968.45 },
+        { regime: "High-Vol", conf: "95%", mean: 0.0133, vol: 1.2286, varPct: 2.0076, varRs: 20076.48 },
+        { regime: "High-Vol", conf: "99%", mean: 0.0133, vol: 1.2286, varPct: 2.8450, varRs: 28449.50 }
+      ],
+      varMethods: [
+        { method: "Parametric-Normal", c95: 1.8003, c99: 2.5132 },
+        { method: "GARCH(1,1)", c95: 2.2603, c99: 3.1638 },
+        { method: "MC-Historical", c95: 1.8135, c99: 2.5086 },
+        { method: "MC-GARCH", c95: 2.2545, c99: 3.1610 }
       ]
     };
   }
@@ -96,30 +116,10 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
   // Fallback for others
   const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const meanReturn = isLiquidGroup ? -0.1 + (seed % 10)/200 : 0.01 + (seed % 10)/1000;
-  const stdReturn = isLiquidGroup ? 1.4 + (seed % 5)/20 : 1.1 + (seed % 5)/50;
-  return {
-    ticker, rank,
-    stats: { meanReturn, stdReturn, minReturn: meanReturn - 3*stdReturn, maxReturn: meanReturn + 3*stdReturn, avgTurnover: stockInfo.turnover, avgAmihud: isLiquidGroup ? 0.0004 : 0.005, avgRollingVol: 15 },
-    vol: { histVol: 15, garchVol: 16, longRunVol: 15, persistence: 0.98 },
-    correlation: { vol_amihud: 0.20 },
-    options: [
-      { strikeLabel: "ATM", dte: 29, mktPrice: 50, bsmHist: 48, bsmGarch: 52, delta: 0.5, gamma: 0.002, vega: 1.0 },
-      { strikeLabel: "OTM_Call", dte: 29, mktPrice: 15, bsmHist: 14, bsmGarch: 16, delta: 0.15, gamma: 0.001, vega: 0.4 },
-      { strikeLabel: "OTM_Put", dte: 29, mktPrice: 18, bsmHist: 17, bsmGarch: 19, delta: -0.18, gamma: 0.001, vega: 0.5 }
-    ],
-    pnlSummary: {
-      strategy: "Dynamic Delta Hedge",
-      netDelta: 0.1234, netGamma: 0.001, netVega: 100, netPremium: 5000,
-      hedgeQty: -12.34, hedgeCost: -15000
-    },
-    pnlScenarios: [
-      { shock: "-2%", vShock: "-20%", total: -50, d: -100, g: 10, v: -20, h: 60 },
-      { shock: "+2%", vShock: "+20%", total: 80, d: 100, g: 10, v: 20, h: -50 }
-    ],
-    var: [
-      { regime: "Full Period", varPct: 1.5 + (rank/30), varRs: 15000 + rank*150 },
-      { regime: "High Vol", varPct: 2.5 + (rank/30), varRs: 25000 + rank*150 }
-    ]
+  return { 
+    ticker, rank, stats: { meanReturn, stdReturn: 1.5, avgRollingVol: 15 }, vol: { histVol: 15, garchVol: 20 }, correlation: { vol_amihud: 0.2 }, 
+    options: [], pnlSummary: { netDelta: 0, netGamma: 0, netVega: 0, netPremium: 0, hedgeQty: 0, hedgeCost: 0 }, 
+    pnlScenarios: [], varAnalysis: [], varMethods: [] 
   };
 };
 
@@ -133,5 +133,22 @@ export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
   const p = i / 120;
   const liqVol = 35 + Math.sin(i * 0.1) * 2 + (p > 0.8 ? (p - 0.8) * 150 : 0) + Math.random() * 5;
   const illiqVol = 32 + p * 15 + Math.sin(i * 0.05) * 1;
-  return { date: date.toLocaleDateString("en-IN", { year:'2-digit', month: "short" }), liqReturn: 0, illiqReturn: 0, liqVol, illiqVol, liqAmihud: 0, illiqAmihud: 0 };
+  const hdfcVaR = 1.5 + (p * 4.5) + Math.sin(i * 0.1) * 0.3;
+  const nestleVaR = 1.4 + (p * 2.2) + Math.cos(i * 0.1) * 0.2;
+  return { 
+    date: date.toLocaleDateString("en-IN", { year:'2-digit', month: "short" }), 
+    liqReturn: (Math.random()-0.5)*0.02 + (p > 0.8 ? 0.03 : 0), 
+    illiqReturn: (Math.random()-0.5)*0.015, 
+    liqVol, illiqVol, 
+    hdfcVaR, nestleVaR,
+    isHighVolLiq: p > 0.6 && Math.sin(i*0.5) > 0.3,
+    isHighVolIlliq: p > 0.7 && Math.cos(i*0.4) > 0.4
+  };
+});
+
+export const HISTOGRAM_DATA = Array.from({ length: 40 }, (_, i) => {
+  const x = -4 + (i * 0.2);
+  const hdfcVal = Math.exp(-Math.pow(x + 0.3, 2) / 2) / Math.sqrt(2 * Math.PI) + (x < -2 ? Math.random()*0.1 : 0);
+  const nestleVal = Math.exp(-Math.pow(x, 2) / 1.5) / Math.sqrt(2 * Math.PI * 0.75);
+  return { bi: x.toFixed(1), hdfc: hdfcVal, nestle: nestleVal };
 });
