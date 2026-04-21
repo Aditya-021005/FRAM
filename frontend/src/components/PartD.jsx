@@ -1,25 +1,43 @@
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  CartesianGrid, Legend, Cell, AreaChart, Area, ComposedChart, ReferenceLine, Line
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  CartesianGrid, Legend, Cell, AreaChart, Area, ComposedChart, ReferenceLine
 } from 'recharts';
 import { HISTOGRAM_DATA, RETURNS_DATA } from '../data';
 
-const CustomTooltip = ({ active, payload, label }) => {
+const C = { amber: '#f5a623', green: '#39d98a', red: '#ff4d4d', blue: '#5b8dee', muted: '#6b6b78' };
+
+const TTip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'var(--tooltip-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 11, boxShadow: 'var(--shadow-sm)' }}>
-      <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
+    <div style={{ background: '#0a0a0b', border: '1px solid #3a3a42', borderRadius: 2, padding: '8px 12px', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}>
+      <div style={{ color: C.amber, fontWeight: 700, marginBottom: 4, letterSpacing: '0.08em' }}>{label}</div>
       {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(4) : p.value}</p>
+        <div key={i} style={{ color: p.color || '#e8e8ec', marginBottom: 2 }}>
+          {p.name}: <span style={{ color: '#fff' }}>{typeof p.value === 'number' ? p.value.toFixed(4) : p.value}</span>
+        </div>
       ))}
     </div>
   );
 };
 
+const ChartBox = ({ title, children, style }) => (
+  <div style={{ border: '1px solid #2a2a30', background: '#111113', borderRadius: 3, padding: '16px 18px', ...style }}>
+    <div style={{ fontSize: 10, color: C.muted, letterSpacing: '0.06em', marginBottom: 14, fontFamily: 'IBM Plex Mono, monospace' }}>{title}</div>
+    {children}
+  </div>
+);
+
+const Label = ({ children }) => (
+  <div style={{ fontSize: 9, fontWeight: 700, color: C.amber, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>{children}</div>
+);
+
+const axisProps = { tick: { fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }, axisLine: false, tickLine: false };
+const legendStyle = { fontSize: 9, fontFamily: 'IBM Plex Mono, monospace' };
+
 export default function PartD({ illiquid, liquid }) {
 
   const getRegimeData = (stock) => {
-    const regimes = ["Full Period", "Normal", "High-Vol"];
+    const regimes = ['Full Period', 'Normal', 'High-Vol'];
     return regimes.map(r => ({
       name: r,
       'VaR 95%': stock.varAnalysis.find(v => v.regime === r && v.conf === '95%')?.varPct,
@@ -28,210 +46,185 @@ export default function PartD({ illiquid, liquid }) {
   };
 
   const getMethodData = () => {
-    const methods = ["Parametric-Normal", "GARCH(1,1)", "MC-Historical", "MC-GARCH"];
+    const methods = ['Parametric-Normal', 'GARCH(1,1)', 'MC-Historical', 'MC-GARCH'];
     return methods.map(m => ({
       name: m,
-      'HDFCBANK 95%': liquid.varMethods.find(v => v.method === m)?.c95,
-      'HDFCBANK 99%': liquid.varMethods.find(v => v.method === m)?.c99,
-      'NESTLEIND 95%': illiquid.varMethods.find(v => v.method === m)?.c95,
-      'NESTLEIND 99%': illiquid.varMethods.find(v => v.method === m)?.c99,
+      [`${liquid.ticker} 95%`]:   liquid.varMethods.find(v => v.method === m)?.c95,
+      [`${liquid.ticker} 99%`]:   liquid.varMethods.find(v => v.method === m)?.c99,
+      [`${illiquid.ticker} 95%`]: illiquid.varMethods.find(v => v.method === m)?.c95,
+      [`${illiquid.ticker} 99%`]: illiquid.varMethods.find(v => v.method === m)?.c99,
     }));
   };
 
-  const HistogramView = ({ dataKey, title, var95, var99, color }) => (
-    <div className="chart-container">
-      <div className="chart-title">{title}</div>
+  const HistView = ({ dataKey, ticker, var95, var99, color }) => (
+    <ChartBox title={`RETURN DISTRIBUTION — ${ticker}`}>
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={HISTOGRAM_DATA}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-          <XAxis dataKey="bi" tick={{ fontSize: 9 }} label={{ value: 'Daily Log Return (%)', position: 'bottom', fontSize: 10, offset: 0 }} />
-          <YAxis tick={{ fontSize: 9 }} label={{ value: 'Density', angle: -90, position: 'insideLeft', fontSize: 10 }} />
-          <Tooltip content={<CustomTooltip />} />
-          <Bar dataKey={dataKey} name="Empirical Returns" fill={color} fillOpacity={0.6} barSize={12} />
-          <ReferenceLine x={var95.toFixed(1)} stroke="#3b82f6" strokeDasharray="5 5" label={{ value: '95%', position: 'top', fill: '#3b82f6', fontSize: 9 }} />
-          <ReferenceLine x={var99.toFixed(1)} stroke="#dc2626" strokeDasharray="5 5" label={{ value: '99%', position: 'top', fill: '#dc2626', fontSize: 9 }} />
+          <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
+          <XAxis dataKey="bi" {...axisProps} label={{ value: 'Daily Log Return (%)', position: 'bottom', fontSize: 9, fill: C.muted, offset: 0 }} />
+          <YAxis {...axisProps} label={{ value: 'Density', angle: -90, position: 'insideLeft', fontSize: 8, fill: C.muted }} />
+          <Tooltip content={<TTip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
+          <Bar dataKey={dataKey} name="Empirical" fill={color} fillOpacity={0.6} barSize={10} />
+          <ReferenceLine x={var95.toFixed(1)} stroke={C.blue} strokeDasharray="4 4"
+            label={{ value: '95%', position: 'top', fill: C.blue, fontSize: 8 }} />
+          <ReferenceLine x={var99.toFixed(1)} stroke={C.red} strokeDasharray="4 4"
+            label={{ value: '99%', position: 'top', fill: C.red, fontSize: 8 }} />
         </ComposedChart>
       </ResponsiveContainer>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', fontSize: '10px', marginTop: '8px' }}>
-         <span style={{ color: '#3b82f6' }}>-- VaR 95% = {var95}%</span>
-         <span style={{ color: '#dc2626' }}>-- VaR 99% = {var99}%</span>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 16, fontSize: 9, marginTop: 8, color: C.muted }}>
+        <span style={{ color: C.blue }}>━━ VaR 95% = {var95}%</span>
+        <span style={{ color: C.red  }}>━━ VaR 99% = {var99}%</span>
       </div>
-    </div>
+    </ChartBox>
   );
 
   return (
-    <div className="slide-up fade-in">
-      <div className="section-header">
-        <h2 className="section-title">Value at Risk (VaR) & Stress Analysis</h2>
-        <p className="section-subtitle">Stressed risk assessment comparing parametric methods with conditional volatility and Monte Carlo simulations.</p>
+    <div style={{ fontFamily: 'IBM Plex Mono, monospace', color: '#e8e8ec', animation: 'fadeUp 0.4s ease both' }}>
+
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontSize: 9, color: C.amber, letterSpacing: '0.14em', marginBottom: 8 }}>PART D · VALUE AT RISK & STRESS ANALYSIS</div>
+        <h2 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', color: '#e8e8ec', marginBottom: 6 }}>Risk Management</h2>
+        <p style={{ fontSize: 11, color: '#6b6b78', lineHeight: 1.7 }}>
+          Stressed risk assessment comparing parametric methods with conditional volatility and Monte Carlo simulations.
+        </p>
       </div>
 
-      {/* Row 1: Distribution */}
-      <div className="grid-2" style={{ gap: '24px', marginBottom: '24px' }}>
-        <HistogramView dataKey="hdfc" title={`Return Distribution — ${liquid.ticker}`} var95={2.47} var99={3.37} color="#3b82f6" />
-        <HistogramView dataKey="nestle" title={`Return Distribution — ${illiquid.ticker}`} var95={1.80} var99={2.51} color="#f87171" />
+      {/* return distributions */}
+      <Label>RETURN DISTRIBUTION WITH VaR CUTOFFS</Label>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+        <HistView dataKey="hdfc"   ticker={liquid.ticker}   var95={2.47} var99={3.37} color={C.blue} />
+        <HistView dataKey="nestle" ticker={illiquid.ticker} var95={1.80} var99={2.51} color={C.red}  />
       </div>
 
-      {/* Row 2: Regime Comparison */}
-      <div className="grid-2" style={{ gap: '24px', marginBottom: '24px' }}>
-        <div className="chart-container">
-          <div className="chart-title">1-Day VaR by Volatility Regime — {liquid.ticker}</div>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={getRegimeData(liquid)}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} label={{ value: 'VaR (%)', angle: -90, position: 'insideLeft', fontSize: 10 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Bar dataKey="VaR 95%" fill="#3b82f6" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="VaR 99%" fill="#f87171" radius={[2, 2, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="chart-container">
-          <div className="chart-title">1-Day VaR by Volatility Regime — {illiquid.ticker}</div>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={getRegimeData(illiquid)}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} label={{ value: 'VaR (%)', angle: -90, position: 'insideLeft', fontSize: 10 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Bar dataKey="VaR 95%" fill="#3b82f6" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="VaR 99%" fill="#f87171" radius={[2, 2, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      {/* regime VaR */}
+      <Label>VaR BY VOLATILITY REGIME</Label>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+        {[{ s: liquid, tag: 'LIQUID' }, { s: illiquid, tag: 'ILLIQUID' }].map(({ s, tag }) => (
+          <ChartBox key={tag} title={`1-DAY VaR BY REGIME — ${s.ticker} (${tag})`}>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={getRegimeData(s)}>
+                <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
+                <XAxis dataKey="name" {...axisProps} />
+                <YAxis {...axisProps} label={{ value: 'VaR (%)', angle: -90, position: 'insideLeft', fontSize: 8, fill: C.muted }} />
+                <Tooltip content={<TTip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
+                <Legend wrapperStyle={legendStyle} />
+                <Bar dataKey="VaR 95%" fill={C.blue} radius={[2, 2, 0, 0]} />
+                <Bar dataKey="VaR 99%" fill={C.red}  radius={[2, 2, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartBox>
+        ))}
       </div>
 
-      {/* Row 3: Method Comparison */}
-      <div className="chart-container" style={{ marginBottom: '24px' }}>
-        <div className="chart-title">VaR Comparison Across Methods (Full Period) — 95% & 99% Confidence</div>
+      {/* method comparison */}
+      <Label>VaR ACROSS METHODS — 95% & 99% CONFIDENCE</Label>
+      <ChartBox title="FULL PERIOD · PARAMETRIC, GARCH, MONTE CARLO" style={{ marginBottom: 20 }}>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={getMethodData()}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-            <YAxis tick={{ fontSize: 10 }} label={{ value: 'VaR (%)', angle: -90, position: 'insideLeft', fontSize: 10 }} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 10 }} />
-            <Bar dataKey="HDFCBANK 95%" fill="#3b82f6" fillOpacity={0.7} />
-            <Bar dataKey="NESTLEIND 95%" fill="#f87171" fillOpacity={0.7} />
-            <Bar dataKey="HDFCBANK 99%" fill="#1d4ed8" />
-            <Bar dataKey="NESTLEIND 99%" fill="#dc2626" />
+            <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
+            <XAxis dataKey="name" {...axisProps} />
+            <YAxis {...axisProps} label={{ value: 'VaR (%)', angle: -90, position: 'insideLeft', fontSize: 8, fill: C.muted }} />
+            <Tooltip content={<TTip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
+            <Legend wrapperStyle={legendStyle} />
+            <Bar dataKey={`${liquid.ticker} 95%`}   fill={C.blue}         fillOpacity={0.7} />
+            <Bar dataKey={`${illiquid.ticker} 95%`} fill={C.red}          fillOpacity={0.7} />
+            <Bar dataKey={`${liquid.ticker} 99%`}   fill="#1d4ed8"        />
+            <Bar dataKey={`${illiquid.ticker} 99%`} fill="#b91c1c"        />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </ChartBox>
 
-      {/* Row 4: Rolling VaR */}
-      <div className="chart-container" style={{ marginBottom: '40px' }}>
-        <div className="chart-title">Rolling 20-Day Parametric VaR (99%) — Full Period</div>
+      {/* rolling VaR */}
+      <Label>ROLLING 20-DAY PARAMETRIC VaR (99%)</Label>
+      <ChartBox title="FULL PERIOD — SHADED AREAS = HIGH-VOL REGIME CLUSTERS" style={{ marginBottom: 24 }}>
         <ResponsiveContainer width="100%" height={240}>
           <AreaChart data={RETURNS_DATA}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-            <XAxis dataKey="date" tick={{ fontSize: 8 }} />
-            <YAxis tick={{ fontSize: 9 }} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 10 }} />
-            <Area type="monotone" dataKey="hdfcVaR" name={`${liquid.ticker} VaR 99%`} stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} />
-            <Area type="monotone" dataKey="nestleVaR" name={`${illiquid.ticker} VaR 99%`} stroke="#dc2626" fill="#dc2626" fillOpacity={0.1} />
-            <Area dataKey="isHighVolLiq" name="High-Vol Regime (Liq)" fill="#3b82f6" fillOpacity={0.05} stroke="none" />
-            <Area dataKey="isHighVolIlliq" name="High-Vol Regime (Illiq)" fill="#dc2626" fillOpacity={0.05} stroke="none" />
+            <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
+            <XAxis dataKey="date" {...axisProps} />
+            <YAxis {...axisProps} />
+            <Tooltip content={<TTip />} />
+            <Legend wrapperStyle={legendStyle} />
+            <Area type="monotone" dataKey="hdfcVaR"       name={`${liquid.ticker} VaR 99%`}   stroke={C.blue} fill={C.blue} fillOpacity={0.12} />
+            <Area type="monotone" dataKey="nestleVaR"     name={`${illiquid.ticker} VaR 99%`} stroke={C.red}  fill={C.red}  fillOpacity={0.12} />
+            <Area dataKey="isHighVolLiq"   fill={C.blue} fillOpacity={0.05} stroke="none" />
+            <Area dataKey="isHighVolIlliq" fill={C.red}  fillOpacity={0.05} stroke="none" />
           </AreaChart>
         </ResponsiveContainer>
-        <div style={{ fontSize: '10px', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '8px' }}>Shaded Areas = High Volatility Clusters (Top 25% rolling vol days)</div>
-      </div>
+      </ChartBox>
 
-      {/* Tables */}
-      <div className="table-container" style={{ marginBottom: '24px' }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>Parametric VaR Matrix (95% & 99% Confidence)</div>
-        <table>
+      {/* parametric VaR table */}
+      <Label>PARAMETRIC VaR MATRIX — 95% & 99%</Label>
+      <div style={{ border: '1px solid #2a2a30', borderRadius: 3, overflow: 'hidden', background: '#111113', marginBottom: 16 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10, color: '#e8e8ec' }}>
           <thead>
-            <tr>
-              <th>Ticker</th>
-              <th>Regime</th>
-              <th>Mean (%)</th>
-              <th>Daily Vol (%)</th>
-              <th>VaR (%)</th>
-              <th>VaR (₹ on 10L)</th>
+            <tr style={{ background: '#0a0a0b', borderBottom: '1px solid #2a2a30' }}>
+              {['TICKER', 'REGIME', 'MEAN (%)', 'DAILY VOL (%)', 'VaR (%)', 'VaR (₹ on 10L)'].map(h => (
+                <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 9, fontWeight: 700, background: '#0a0a0b', color: '#e8e8ec', borderBottom: '1px solid #2a2a30', letterSpacing: '0.1em' }}>{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {liquid.varAnalysis.map((v, i) => (
-              <tr key={`l-${i}`} style={{ background: i < 2 ? 'rgba(59, 130, 246, 0.03)' : 'transparent' }}>
-                <td>{liquid.ticker}</td>
-                <td>{v.regime} ({v.conf})</td>
-                <td>{v.mean.toFixed(4)}%</td>
-                <td>{v.vol.toFixed(4)}%</td>
-                <td>{v.varPct.toFixed(4)}%</td>
-                <td style={{ fontWeight: 600 }}>₹{v.varRs.toLocaleString()}</td>
-              </tr>
-            ))}
-            {illiquid.varAnalysis.map((v, i) => (
-              <tr key={`i-${i}`} style={{ background: i < 2 ? 'rgba(248, 113, 113, 0.03)' : 'transparent' }}>
-                <td>{illiquid.ticker}</td>
-                <td>{v.regime} ({v.conf})</td>
-                <td>{v.mean.toFixed(4)}%</td>
-                <td>{v.vol.toFixed(4)}%</td>
-                <td>{v.varPct.toFixed(4)}%</td>
-                <td style={{ fontWeight: 600 }}>₹{v.varRs.toLocaleString()}</td>
+            {[...liquid.varAnalysis.map(v => ({ ...v, ticker: liquid.ticker, isLiq: true })),
+              ...illiquid.varAnalysis.map(v => ({ ...v, ticker: illiquid.ticker, isLiq: false }))
+            ].map((v, i) => (
+              <tr key={i} style={{ borderBottom: '1px solid #1a1a1f', background: v.isLiq ? 'rgba(91,141,238,0.03)' : 'rgba(255,77,77,0.03)' }}>
+                <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>
+                  <span style={{ fontSize: 8, background: v.isLiq ? C.blue : C.red, color: '#000', fontWeight: 800, padding: '2px 5px', borderRadius: 2, marginRight: 6 }}>
+                    {v.isLiq ? 'L' : 'I'}
+                  </span>
+                  {v.ticker}
+                </td>
+                <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>{v.regime} ({v.conf})</td>
+                <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>{v.mean.toFixed(4)}%</td>
+                <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>{v.vol.toFixed(4)}%</td>
+                <td style={{ padding: '8px 14px', color: C.amber }}>{v.varPct.toFixed(4)}%</td>
+                <td style={{ padding: '8px 14px', color: C.amber, fontWeight: 700 }}>₹{(v.varPct * 10000).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="table-container">
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>GARCH & Monte Carlo VaR Comparison</div>
-        <table>
+      {/* GARCH & MC table */}
+      <Label>GARCH & MONTE CARLO VaR COMPARISON</Label>
+      <div style={{ border: '1px solid #2a2a30', borderRadius: 3, overflow: 'hidden', background: '#111113' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10, color: '#e8e8ec' }}>
           <thead>
-            <tr>
-              <th>Ticker</th>
-              <th>Method</th>
-              <th>Cond Vol (%)</th>
-              <th>VaR 95% (%)</th>
-              <th>VaR 99% (%)</th>
-              <th>Capital at Risk (99%)</th>
+            <tr style={{ background: '#0a0a0b', borderBottom: '1px solid #2a2a30' }}>
+              {['TICKER', 'METHOD', 'COND VOL (%)', 'VaR 95% (%)', 'VaR 99% (%)', 'CAPITAL AT RISK (99%)'].map(h => (
+                <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 9, fontWeight: 700, background: '#0a0a0b', color: '#e8e8ec', borderBottom: '1px solid #2a2a30', letterSpacing: '0.1em' }}>{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {liquid.varMethods && liquid.varMethods.length > 1 && (
+            {liquid.varMethods?.length > 1 && (
               <>
-                <tr>
-                  <td>{liquid.ticker}</td>
-                  <td style={{ fontWeight: 600 }}>GARCH(1,1)</td>
-                  <td>{(liquid.vol?.dailyCondVol || 0).toFixed(4)}%</td>
-                  <td>{(liquid.varMethods[1]?.c95 || 0).toFixed(4)}%</td>
-                  <td>{(liquid.varMethods[1]?.c99 || 0).toFixed(4)}%</td>
-                  <td>₹{(liquid.varMethods[1]?.c99 * 10000 || 0).toLocaleString()}</td>
-                </tr>
-                <tr>
-                  <td>{illiquid.ticker}</td>
-                  <td style={{ fontWeight: 600 }}>GARCH(1,1)</td>
-                  <td>{(illiquid.vol?.dailyCondVol || 0).toFixed(4)}%</td>
-                  <td>{(illiquid.varMethods[1]?.c95 || 0).toFixed(4)}%</td>
-                  <td>{(illiquid.varMethods[1]?.c99 || 0).toFixed(4)}%</td>
-                  <td>₹{(illiquid.varMethods[1]?.c99 * 10000 || 0).toLocaleString()}</td>
-                </tr>
-              </>
-            )}
-            {liquid.varMethods && liquid.varMethods.length > 2 && (
-              <>
-                <tr style={{ borderTop: '1px solid var(--border)' }}>
-                  <td>{liquid.ticker}</td>
-                  <td>MC-Historical</td>
-                  <td>-</td>
-                  <td>{(liquid.varMethods[2]?.c95 || 0).toFixed(4)}%</td>
-                  <td>{(liquid.varMethods[2]?.c99 || 0).toFixed(4)}%</td>
-                  <td>₹{(liquid.varMethods[2]?.c99 * 10000 || 0).toLocaleString()}</td>
-                </tr>
-                <tr>
-                  <td>{illiquid.ticker}</td>
-                  <td>MC-Historical</td>
-                  <td>-</td>
-                  <td>{(illiquid.varMethods[2]?.c95 || 0).toFixed(4)}%</td>
-                  <td>{(illiquid.varMethods[2]?.c99 || 0).toFixed(4)}%</td>
-                  <td>₹{(illiquid.varMethods[2]?.c99 * 10000 || 0).toLocaleString()}</td>
-                </tr>
+                {[{ s: liquid, color: C.blue, tag: 'L' }, { s: illiquid, color: C.red, tag: 'I' }].map(({ s, color, tag }) => (
+                  <tr key={s.ticker} style={{ borderBottom: '1px solid #1e1e24' }}>
+                    <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>
+                      <span style={{ fontSize: 8, background: color, color: '#000', fontWeight: 800, padding: '2px 5px', borderRadius: 2, marginRight: 6 }}>{tag}</span>
+                      {s.ticker}
+                    </td>
+                    <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>GARCH(1,1)</td>
+                    <td style={{ padding: '8px 14px', color: C.amber }}>{s.vol.garchVol.toFixed(3)}%</td>
+                    <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>{(s.varMethods[1]?.c95 || 0).toFixed(4)}%</td>
+                    <td style={{ padding: '8px 14px', color: C.amber }}>{(s.varMethods[1]?.c99 || 0).toFixed(4)}%</td>
+                    <td style={{ padding: '8px 14px', fontWeight: 700, color: C.red }}>₹{((s.varMethods[1]?.c99 || 0) * 10000).toLocaleString()}</td>
+                  </tr>
+                ))}
+                {[{ s: liquid, color: C.blue, tag: 'L' }, { s: illiquid, color: C.red, tag: 'I' }].map(({ s, color, tag }) => (
+                  <tr key={s.ticker + 'mc'} style={{ borderBottom: '1px solid #1e1e24' }}>
+                    <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>
+                      <span style={{ fontSize: 8, background: color, color: '#000', fontWeight: 800, padding: '2px 5px', borderRadius: 2, marginRight: 6 }}>{tag}</span>
+                      {s.ticker}
+                    </td>
+                    <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>MC-Historical</td>
+                    <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>—</td>
+                    <td style={{ padding: '8px 14px', color: '#e8e8ec' }}>{(s.varMethods[2]?.c95 || 0).toFixed(4)}%</td>
+                    <td style={{ padding: '8px 14px', color: C.amber }}>{(s.varMethods[2]?.c99 || 0).toFixed(4)}%</td>
+                    <td style={{ padding: '8px 14px', fontWeight: 700, color: C.red }}>₹{((s.varMethods[2]?.c99 || 0) * 10000).toLocaleString()}</td>
+                  </tr>
+                ))}
               </>
             )}
           </tbody>

@@ -1,23 +1,52 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line, ScatterChart, Scatter } from 'recharts';
 import { NIFTY50_RANKING, RETURNS_DATA, getIlliquidData, getLiquidData } from '../data';
 
-const CustomTooltip = ({ active, payload, label }) => {
+/* ── shared token palette (mirrors App.jsx vars) ── */
+const C = {
+  amber: '#f5a623',
+  green: '#39d98a',
+  red: '#ff4d4d',
+  blue: '#5b8dee',
+  muted: '#6b6b78',
+};
+
+/* ── terminal tooltip ── */
+const TTip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'var(--tooltip-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12 }}>
-      <p style={{ fontWeight: 600, marginBottom: 4, color: 'var(--tooltip-text)' }}>{label}</p>
+    <div style={{ background: '#0a0a0b', border: '1px solid #3a3a42', borderRadius: 2, padding: '8px 12px', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}>
+      <div style={{ color: C.amber, fontWeight: 700, marginBottom: 4, letterSpacing: '0.08em' }}>{label}</div>
       {payload.map((p, i) => (
-        <p key={i} style={{ color: 'var(--tooltip-sub)', marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}</p>
+        <div key={i} style={{ color: p.color || '#e8e8ec', marginBottom: 2 }}>
+          {p.name}: <span style={{ color: '#fff' }}>{typeof p.value === 'number' ? p.value.toFixed(4) : p.value}</span>
+        </div>
       ))}
     </div>
   );
 };
 
-const barColors = (category) => {
-  if (category === 'LIQUID') return 'var(--chart-1)';
-  if (category === 'ILLIQUID') return 'var(--chart-2)';
-  return 'var(--chart-3)';
-};
+/* ── section label ── */
+const Label = ({ children }) => (
+  <div style={{ fontSize: 9, fontWeight: 700, color: C.amber, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>{children}</div>
+);
+
+/* ── chart wrapper ── */
+const ChartBox = ({ title, children, style }) => (
+  <div style={{ border: '1px solid #2a2a30', background: '#111113', borderRadius: 3, padding: '16px 18px', ...style }}>
+    <div style={{ fontSize: 10, color: C.muted, letterSpacing: '0.06em', marginBottom: 14, fontFamily: 'IBM Plex Mono, monospace' }}>{title}</div>
+    {children}
+  </div>
+);
+
+/* ── stat pill ── */
+const Stat = ({ label, value, accent }) => (
+  <div style={{ border: '1px solid #2a2a30', background: '#18181c', borderRadius: 3, padding: '14px 16px' }}>
+    <div style={{ fontSize: 8, color: C.muted, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
+    <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: accent || '#e8e8ec', fontFamily: 'IBM Plex Mono, monospace' }}>{value}</div>
+  </div>
+);
+
+const barColors = (cat) => cat === 'LIQUID' ? C.amber : C.muted;
 
 export default function PartA({ illiquid, liquid }) {
   const liqStocks = NIFTY50_RANKING.filter(s => s.category === 'LIQUID');
@@ -28,259 +57,234 @@ export default function PartA({ illiquid, liquid }) {
     category: d.category,
   }));
 
-
-
-  const renderCorrelationMatrix = (s, title) => (
-    <div className="card" style={{ padding: '20px' }}>
-      <div className="card-header" style={{ marginBottom: '16px' }}>
-        <span className="card-title" style={{ fontSize: '13px' }}>Correlation Matrix — {title}</span>
-      </div>
-      <table className="mini-table">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Vol</th>
-            <th>Amihud</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style={{ fontWeight: 600 }}>Vol</td>
-            <td>1.0000</td>
-            <td>{s.correlation?.vol_amihud.toFixed(4) || '0.0000'}</td>
-          </tr>
-          <tr>
-            <td style={{ fontWeight: 600 }}>Amihud</td>
-            <td>{s.correlation?.vol_amihud.toFixed(4) || '0.0000'}</td>
-            <td>1.0000</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
+  const axisProps = { tick: { fontSize: 9, fill: '#6b6b78', fontFamily: 'IBM Plex Mono, monospace' }, axisLine: false, tickLine: false };
 
   return (
-    <div className="slide-up fade-in">
-      <div className="section-header">
-        <h2 className="section-title">Stock Selection & Liquidity</h2>
-        <p className="section-subtitle">NIFTY 50 ranking by turnover. Comparing <strong>{liquid.ticker}</strong> (Liquid) vs <strong>{illiquid.ticker}</strong> (Illiquid).</p>
+    <div style={{ fontFamily: 'IBM Plex Mono, monospace', color: '#e8e8ec', animation: 'fadeUp 0.4s ease both' }}>
+
+      {/* header */}
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontSize: 9, color: C.amber, letterSpacing: '0.14em', marginBottom: 8 }}>PART A · STOCK SELECTION & LIQUIDITY</div>
+        <h2 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', color: '#e8e8ec', marginBottom: 6 }}>Liquidity Analysis</h2>
+        <p style={{ fontSize: 11, color: '#6b6b78', lineHeight: 1.7 }}>
+          NIFTY 50 ranking by turnover — comparing <span style={{ color: C.green }}>{liquid.ticker}</span> (liquid) vs <span style={{ color: C.red }}>{illiquid.ticker}</span> (illiquid)
+        </p>
       </div>
 
-      <div className="grid-2" style={{ marginBottom: 32 }}>
-        <div className="stat-card">
-          <div className="stat-label">Selected Liquid stock</div>
-          <div className="stat-value">{liquid.ticker.replace('.NS', '')}</div>
-          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>Rank #{liquid.rank} · NIFTY 50</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Selected Illiquid stock</div>
-          <div className="stat-value">{illiquid.ticker.replace('.NS', '')}</div>
-          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>Rank #{illiquid.rank} · NIFTY 50</div>
-        </div>
+      {/* stat row */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
+        <Stat label="Liquid Stock" value={liquid.ticker.replace('.NS', '')} accent={C.green} />
+        <Stat label={`Rank · NIFTY 50`} value={`#${liquid.rank}`} accent={C.amber} />
+        <Stat label="Illiquid Stock" value={illiquid.ticker.replace('.NS', '')} accent={C.red} />
+        <Stat label={`Rank · NIFTY 50`} value={`#${illiquid.rank}`} accent={C.amber} />
       </div>
 
-      <div className="chart-container">
-        <div className="chart-title">Turnover Ranking — Top 25% vs Bottom 25%</div>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="turnover" radius={[4, 4, 0, 0]}>
-              {chartData.map((entry, i) => (
-                <Cell key={i} fill={barColors(entry.category)} />
-              ))}
+      {/* main turnover chart */}
+      <ChartBox title="TURNOVER RANKING — TOP 25% vs BOTTOM 25%" style={{ marginBottom: 20 }}>
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={chartData} margin={{ top: 4, right: 16, bottom: 4, left: 0 }}>
+            <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
+            <XAxis dataKey="name" {...axisProps} />
+            <YAxis {...axisProps} />
+            <Tooltip content={<TTip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
+            <Bar dataKey="turnover" radius={[2, 2, 0, 0]}>
+              {chartData.map((e, i) => <Cell key={i} fill={barColors(e.category)} fillOpacity={0.85} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-      </div>
+        <div style={{ display: 'flex', gap: 16, marginTop: 8, fontSize: 9, color: C.muted }}>
+          <span><span style={{ color: C.amber }}>■</span> LIQUID (Top 25%)</span>
+          <span><span style={{ color: C.muted }}>■</span> ILLIQUID (Bottom 25%)</span>
+        </div>
+      </ChartBox>
 
-      <div className="grid-2" style={{ marginTop: 32, gap: '24px' }}>
-        {/* Row 1: Daily Log Returns */}
-        <div className="chart-container">
-          <div className="chart-title">Daily Log Returns — Liquid ({liquid.ticker})</div>
-          <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={RETURNS_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-              <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} domain={[-0.06, 0.06]} />
-              <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="liqReturn" stroke="var(--chart-1)" dot={false} strokeWidth={1} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="chart-container">
-          <div className="chart-title">Daily Log Returns — Illiquid ({illiquid.ticker})</div>
-          <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={RETURNS_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
-              <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} domain={[-0.06, 0.06]} />
-              <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="illiqReturn" stroke="var(--chart-2)" dot={false} strokeWidth={1} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+      {/* 3-row chart grid */}
+      <Label>TIME-SERIES ANALYSIS</Label>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
 
-        {/* Row 2: Rolling Volatility */}
-        <div className="chart-container">
-          <div className="chart-title">20-Day Rolling Volatility — Liquid ({liquid.ticker})</div>
-          <ResponsiveContainer width="100%" height={180}>
+        <ChartBox title={`DAILY LOG RETURNS — ${liquid.ticker} (LIQUID)`}>
+          <ResponsiveContainer width="100%" height={160}>
             <LineChart data={RETURNS_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="liqVol" stroke="var(--chart-1)" dot={false} strokeWidth={2} />
+              <YAxis {...axisProps} domain={[-0.06, 0.06]} />
+              <Tooltip content={<TTip />} />
+              <Line type="monotone" dataKey="liqReturn" stroke={C.green} dot={false} strokeWidth={1} />
             </LineChart>
           </ResponsiveContainer>
-        </div>
-        <div className="chart-container">
-          <div className="chart-title">20-Day Rolling Volatility — Illiquid ({illiquid.ticker})</div>
-          <ResponsiveContainer width="100%" height={180}>
+        </ChartBox>
+        <ChartBox title={`DAILY LOG RETURNS — ${illiquid.ticker} (ILLIQUID)`}>
+          <ResponsiveContainer width="100%" height={160}>
             <LineChart data={RETURNS_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="illiqVol" stroke="var(--chart-2)" dot={false} strokeWidth={2} />
+              <YAxis {...axisProps} domain={[-0.06, 0.06]} />
+              <Tooltip content={<TTip />} />
+              <Line type="monotone" dataKey="illiqReturn" stroke={C.red} dot={false} strokeWidth={1} />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </ChartBox>
 
-        {/* Row 3: Amihud Illiquidity */}
-        <div className="chart-container">
-          <div className="chart-title">Amihud Illiquidity — Liquid ({liquid.ticker})</div>
-          <ResponsiveContainer width="100%" height={180}>
+        <ChartBox title={`20-DAY ROLLING VOLATILITY — ${liquid.ticker}`}>
+          <ResponsiveContainer width="100%" height={160}>
             <LineChart data={RETURNS_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} name="Units of 10^-9" />
-              <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="liqAmihud" stroke="var(--chart-1)" dot={false} strokeWidth={1} />
+              <YAxis {...axisProps} />
+              <Tooltip content={<TTip />} />
+              <Line type="monotone" dataKey="liqVol" stroke={C.amber} dot={false} strokeWidth={1.5} />
             </LineChart>
           </ResponsiveContainer>
-        </div>
-        <div className="chart-container">
-          <div className="chart-title">Amihud Illiquidity — Illiquid ({illiquid.ticker})</div>
-          <ResponsiveContainer width="100%" height={180}>
+        </ChartBox>
+        <ChartBox title={`20-DAY ROLLING VOLATILITY — ${illiquid.ticker}`}>
+          <ResponsiveContainer width="100%" height={160}>
             <LineChart data={RETURNS_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
               <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} name="Units of 10^-9" />
-              <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="illiqAmihud" stroke="var(--chart-2)" dot={false} strokeWidth={1} />
+              <YAxis {...axisProps} />
+              <Tooltip content={<TTip />} />
+              <Line type="monotone" dataKey="illiqVol" stroke={C.blue} dot={false} strokeWidth={1.5} />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </ChartBox>
 
-        {/* Row 4: Volatility vs Amihud Scatter */}
-        <div className="chart-container">
-          <div className="chart-title">Volatility vs Amihud — Liquid ({liquid.ticker})</div>
-          <ResponsiveContainer width="100%" height={180}>
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
-              <XAxis type="number" dataKey="liqAmihud" name="Amihud" tick={{ fontSize: 10 }} />
-              <YAxis type="number" dataKey="liqVol" name="Rolling Vol" tick={{ fontSize: 10 }} />
-              <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-              <Scatter name="Liquid" data={RETURNS_DATA} fill="var(--chart-1)" fillOpacity={0.6} />
+        <ChartBox title={`AMIHUD ILLIQUIDITY — ${liquid.ticker}`}>
+          <ResponsiveContainer width="100%" height={160}>
+            <LineChart data={RETURNS_DATA}>
+              <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
+              <XAxis dataKey="date" hide />
+              <YAxis {...axisProps} />
+              <Tooltip content={<TTip />} />
+              <Line type="monotone" dataKey="liqAmihud" stroke={C.green} dot={false} strokeWidth={1} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartBox>
+        <ChartBox title={`AMIHUD ILLIQUIDITY — ${illiquid.ticker}`}>
+          <ResponsiveContainer width="100%" height={160}>
+            <LineChart data={RETURNS_DATA}>
+              <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" vertical={false} />
+              <XAxis dataKey="date" hide />
+              <YAxis {...axisProps} />
+              <Tooltip content={<TTip />} />
+              <Line type="monotone" dataKey="illiqAmihud" stroke={C.red} dot={false} strokeWidth={1} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartBox>
+
+        <ChartBox title={`VOL vs AMIHUD SCATTER — ${liquid.ticker}`}>
+          <ResponsiveContainer width="100%" height={160}>
+            <ScatterChart margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
+              <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" />
+              <XAxis type="number" dataKey="liqAmihud" name="Amihud" tick={{ fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }} axisLine={false} tickLine={false} />
+              <YAxis type="number" dataKey="liqVol" name="Rolling Vol" tick={{ fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }} axisLine={false} tickLine={false} />
+              <Tooltip cursor={{ strokeDasharray: '3 3' }} content={<TTip />} />
+              <Scatter data={RETURNS_DATA} fill={C.green} fillOpacity={0.5} />
             </ScatterChart>
           </ResponsiveContainer>
-        </div>
-        <div className="chart-container">
-          <div className="chart-title">Volatility vs Amihud — Illiquid ({illiquid.ticker})</div>
-          <ResponsiveContainer width="100%" height={180}>
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
-              <XAxis type="number" dataKey="illiqAmihud" name="Amihud" tick={{ fontSize: 10 }} />
-              <YAxis type="number" dataKey="illiqVol" name="Rolling Vol" tick={{ fontSize: 10 }} />
-              <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-              <Scatter name="Illiquid" data={RETURNS_DATA} fill="var(--chart-2)" fillOpacity={0.6} />
+        </ChartBox>
+        <ChartBox title={`VOL vs AMIHUD SCATTER — ${illiquid.ticker}`}>
+          <ResponsiveContainer width="100%" height={160}>
+            <ScatterChart margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
+              <CartesianGrid strokeDasharray="2 4" stroke="#1e1e24" />
+              <XAxis type="number" dataKey="illiqAmihud" name="Amihud" tick={{ fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }} axisLine={false} tickLine={false} />
+              <YAxis type="number" dataKey="illiqVol" name="Rolling Vol" tick={{ fontSize: 9, fill: C.muted, fontFamily: 'IBM Plex Mono, monospace' }} axisLine={false} tickLine={false} />
+              <Tooltip cursor={{ strokeDasharray: '3 3' }} content={<TTip />} />
+              <Scatter data={RETURNS_DATA} fill={C.red} fillOpacity={0.5} />
             </ScatterChart>
           </ResponsiveContainer>
-        </div>
+        </ChartBox>
       </div>
 
-      <div className="table-container" style={{ marginTop: 32 }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          NIFTY 50 Liquidity & Risk Comparison
-          <div style={{ display: 'flex', gap: '8px', fontSize: '12px', fontWeight: 400, color: 'var(--text-secondary)' }}>
-            <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>L</span> Liquid Selected &nbsp;
-            <span style={{ background: 'var(--bg-muted)', color: 'var(--text-primary)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', fontWeight: 600 }}>I</span> Illiquid Selected
-          </div>
-        </div>
-        <table style={{ minWidth: '800px' }}>
+      {/* data table */}
+      <Label>NIFTY 50 · LIQUIDITY & RISK COMPARISON</Label>
+      <div style={{ border: '1px solid #2a2a30', borderRadius: 3, overflow: 'hidden', background: '#111113' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, color: '#e8e8ec' }}>
           <thead>
-            <tr>
-              <th>Security</th>
-              <th>Mean (%)</th>
-              <th>Std Dev (%)</th>
-              <th>Avg Turnover (Cr)</th>
-              <th>Amihud Ratio</th>
+            <tr style={{ background: '#0a0a0b', borderBottom: '1px solid #2a2a30' }}>
+              {['SECURITY', 'MEAN (%)', 'STD DEV (%)', 'AVG TURNOVER (CR)', 'AMIHUD RATIO'].map(h => (
+                <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 9, fontWeight: 700, background: '#0a0a0b', color: '#e8e8ec', borderBottom: '1px solid #2a2a30', letterSpacing: '0.1em' }}>{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            <tr style={{ borderLeft: '3px solid var(--accent)', background: 'var(--bg-muted)' }}>
-              <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ background: 'var(--accent)', color: 'var(--accent-fg)', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px' }}>L</span>
+            {/* selected liquid */}
+            <tr style={{ borderLeft: `3px solid ${C.green}`, borderBottom: '1px solid #2a2a30', background: 'rgba(57,217,138,0.08)' }}>
+              <td style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8, color: '#e8e8ec' }}>
+                <span style={{ background: C.green, color: '#000', fontSize: 8, fontWeight: 800, padding: '2px 6px', borderRadius: 2 }}>LIQ</span>
                 {liquid.ticker}
               </td>
-              <td>{liquid.stats.meanReturn.toFixed(4)}%</td>
-              <td>{liquid.stats.stdReturn.toFixed(2)}%</td>
-              <td>₹{liquid.stats.avgTurnover.toFixed(2)}</td>
-              <td>{liquid.stats.avgAmihud.toFixed(4)}</td>
+              <td style={{ padding: '10px 16px', color: '#e8e8ec' }}>{liquid.stats.meanReturn.toFixed(4)}%</td>
+              <td style={{ padding: '10px 16px', color: '#e8e8ec' }}>{liquid.stats.stdReturn.toFixed(2)}%</td>
+              <td style={{ padding: '10px 16px', color: '#e8e8ec' }}>₹{liquid.stats.avgTurnover.toFixed(2)}</td>
+              <td style={{ padding: '10px 16px', color: '#e8e8ec' }}>{liquid.stats.avgAmihud.toFixed(4)}</td>
             </tr>
-            <tr style={{ borderLeft: '3px solid var(--text-secondary)', background: 'var(--bg-muted)', borderBottom: '2px solid var(--border)' }}>
-              <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px', border: '1px solid var(--border)' }}>I</span>
+            {/* selected illiquid */}
+            <tr style={{ borderLeft: `3px solid ${C.red}`, borderBottom: '2px solid #3a3a42', background: 'rgba(255,77,77,0.08)' }}>
+              <td style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8, color: '#e8e8ec' }}>
+                <span style={{ background: C.red, color: '#000', fontSize: 8, fontWeight: 800, padding: '2px 6px', borderRadius: 2 }}>ILL</span>
                 {illiquid.ticker}
               </td>
-              <td>{illiquid.stats.meanReturn.toFixed(4)}%</td>
-              <td>{illiquid.stats.stdReturn.toFixed(2)}%</td>
-              <td>₹{illiquidStocks.find(s => s.ticker === illiquid.ticker)?.turnover.toFixed(2)}</td>
-              <td>{illiquid.stats.avgAmihud.toFixed(4)}</td>
+              <td style={{ padding: '10px 16px', color: '#e8e8ec' }}>{illiquid.stats.meanReturn.toFixed(4)}%</td>
+              <td style={{ padding: '10px 16px', color: '#e8e8ec' }}>{illiquid.stats.stdReturn.toFixed(2)}%</td>
+              <td style={{ padding: '10px 16px', color: '#e8e8ec' }}>₹{illiquidStocks.find(s => s.ticker === illiquid.ticker)?.turnover.toFixed(2)}</td>
+              <td style={{ padding: '10px 16px', color: '#e8e8ec' }}>{illiquid.stats.avgAmihud.toFixed(4)}</td>
             </tr>
-            {liqStocks.map(s => {
-              const data = getLiquidData(s.ticker);
-              const isSelected = s.ticker === liquid.ticker;
-              if (isSelected) return null;
+            {/* rest */}
+            {liqStocks.filter(s => s.ticker !== liquid.ticker).map(s => {
+              const d = getLiquidData(s.ticker);
               return (
-                <tr key={s.ticker}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, padding: '2px 7px' }}>L</span>
-                    {s.ticker}
+                <tr key={s.ticker} style={{ borderBottom: '1px solid #1e1e24' }}>
+                  <td style={{ padding: '9px 16px', display: 'flex', alignItems: 'center', gap: 8, color: '#e8e8ec' }}>
+                    <span style={{ color: '#e8e8ec', fontSize: 8, padding: '2px 6px' }}>L</span>{s.ticker}
                   </td>
-                  <td>{data.stats.meanReturn.toFixed(4)}%</td>
-                  <td>{data.stats.stdReturn.toFixed(2)}%</td>
-                  <td>₹{s.turnover.toFixed(2)}</td>
-                  <td>{data.stats.avgAmihud.toFixed(4)}</td>
+                  <td style={{ padding: '9px 16px', color: '#e8e8ec' }}>{d.stats.meanReturn.toFixed(4)}%</td>
+                  <td style={{ padding: '9px 16px', color: '#e8e8ec' }}>{d.stats.stdReturn.toFixed(2)}%</td>
+                  <td style={{ padding: '9px 16px', color: '#e8e8ec' }}>₹{s.turnover.toFixed(2)}</td>
+                  <td style={{ padding: '9px 16px', color: '#e8e8ec' }}>{d.stats.avgAmihud.toFixed(4)}</td>
                 </tr>
               );
             })}
-            {illiquidStocks.map(s => {
-              const data = getIlliquidData(s.ticker);
-              const isSelected = s.ticker === illiquid.ticker;
-              if (isSelected) return null;
+            {illiquidStocks.filter(s => s.ticker !== illiquid.ticker).map(s => {
+              const d = getIlliquidData(s.ticker);
               return (
-                <tr key={s.ticker}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontWeight: 700, padding: '2px 7px' }}>I</span>
-                    {s.ticker}
+                <tr key={s.ticker} style={{ borderBottom: '1px solid #1e1e24' }}>
+                  <td style={{ padding: '9px 16px', display: 'flex', alignItems: 'center', gap: 8, color: '#e8e8ec' }}>
+                    <span style={{ color: '#e8e8ec', fontSize: 8, padding: '2px 6px' }}>I</span>{s.ticker}
                   </td>
-                  <td>{data.stats.meanReturn.toFixed(4)}%</td>
-                  <td>{data.stats.stdReturn.toFixed(2)}%</td>
-                  <td>₹{s.turnover.toFixed(2)}</td>
-                  <td>{data.stats.avgAmihud.toFixed(4)}</td>
+                  <td style={{ padding: '9px 16px', color: '#e8e8ec' }}>{d.stats.meanReturn.toFixed(4)}%</td>
+                  <td style={{ padding: '9px 16px', color: '#e8e8ec' }}>{d.stats.stdReturn.toFixed(2)}%</td>
+                  <td style={{ padding: '9px 16px', color: '#e8e8ec' }}>₹{s.turnover.toFixed(2)}</td>
+                  <td style={{ padding: '9px 16px', color: '#e8e8ec' }}>{d.stats.avgAmihud.toFixed(4)}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-      <div className="grid-2" style={{ marginTop: 32, gap: '24px' }}>
-        {renderCorrelationMatrix(liquid, `${liquid.ticker} (Liquid)`)}
-        {renderCorrelationMatrix(illiquid, `${illiquid.ticker} (Illiquid)`)}
+
+      {/* correlation matrices */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 20 }}>
+        {[{ s: liquid, label: 'LIQUID' }, { s: illiquid, label: 'ILLIQUID' }].map(({ s, label }) => (
+          <div key={label} style={{ border: '1px solid #2a2a30', background: '#111113', borderRadius: 3, padding: '16px 18px' }}>
+            <div style={{ fontSize: 9, color: C.amber, letterSpacing: '0.12em', marginBottom: 12 }}>CORRELATION MATRIX — {s.ticker} ({label})</div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: '#e8e8ec' }}>
+              <thead>
+                <tr>
+                  {['', 'VOL', 'AMIHUD'].map(h => <th key={h} style={{ padding: '6px 10px', textAlign: 'right', fontSize: 9, color: '#e8e8ec', fontWeight: 700 }}>{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {[['Vol', '1.0000', (s.correlation?.vol_amihud || 0).toFixed(4)],
+                ['Amihud', (s.correlation?.vol_amihud || 0).toFixed(4), '1.0000']].map(([row, ...vals]) => (
+                  <tr key={row} style={{ borderTop: '1px solid #1e1e24' }}>
+                    <td style={{ padding: '8px 10px', color: '#e8e8ec', fontSize: 9, fontWeight: 700 }}>{row}</td>
+                    {vals.map((v, i) => <td key={i} style={{ padding: '8px 10px', textAlign: 'right', color: '#e8e8ec' }}>{v}</td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
       </div>
     </div>
   );
