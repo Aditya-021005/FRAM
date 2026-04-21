@@ -13,47 +13,20 @@ export const NIFTY50_RANKING = [
   { rank: 5, ticker: "SBIN.NS", turnover: 2087.62, category: "LIQUID" },
   { rank: 6, ticker: "BHARTIARTL.NS", turnover: 1956.31, category: "LIQUID" },
   { rank: 7, ticker: "INFOSYS.NS", turnover: 1834.19, category: "LIQUID" },
+  { rank: 38, ticker: "HDFCLIFE.NS", turnover: 423.87, category: "ILLIQUID" },
+  { rank: 39, ticker: "BRITANNIA.NS", turnover: 398.54, category: "ILLIQUID" },
+  { rank: 40, ticker: "SBILIFE.NS", turnover: 374.21, category: "ILLIQUID" },
+  { rank: 41, ticker: "EICHERMOT.NS", turnover: 351.93, category: "ILLIQUID" },
+  { rank: 42, ticker: "BPCL.NS", turnover: 328.47, category: "ILLIQUID" },
+  { rank: 43, ticker: "ASIANPAINT.NS", turnover: 306.82, category: "ILLIQUID" },
+  { rank: 44, ticker: "HEROMOTOCO.NS", turnover: 284.65, category: "ILLIQUID" },
+  { rank: 45, ticker: "APOLLOHOSP.NS", turnover: 263.38, category: "ILLIQUID" },
+  { rank: 46, ticker: "DIVISLAB.NS", turnover: 241.74, category: "ILLIQUID" },
+  { rank: 47, ticker: "BEL.NS", turnover: 218.93, category: "ILLIQUID" },
   { rank: 48, ticker: "BAJAJ-AUTO.NS", turnover: 196.47, category: "ILLIQUID" },
   { rank: 49, ticker: "NESTLEIND.NS", turnover: 174.82, category: "ILLIQUID" },
   { rank: 50, ticker: "SHRIRAMFIN.NS", turnover: 152.36, category: "ILLIQUID" },
 ];
-
-export const ILLIQUID_OPTIONS = {
-  SHRIRAMFIN: {
-    ticker: "SHRIRAMFIN.NS",
-    stats: { meanReturn: 0.0287, stdReturn: 2.1567, minReturn: -6.42, maxReturn: 5.89, avgTurnover: 152.36, avgAmihud: 1.8734, avgRollingVol: 31.28 },
-    vol: { histVol: 31.28, garchVol: 35.42, longRunVol: 28.91, persistence: 0.9812 },
-    options: [
-      { strikeLabel: "ATM", optType: "Call", spot: 628.4, strike: 630, histVol: 31.28, mktPrice: 32.87, bsmHist: 28.56, dev: 15.09, bsmGarch: 34.21, dte: 29 },
-      { strikeLabel: "OTM_Call", optType: "Call", spot: 628.4, strike: 670, histVol: 31.28, mktPrice: 14.23, bsmHist: 11.34, dev: 25.49, bsmGarch: 16.78, dte: 29 },
-    ],
-    pnl: [
-       { priceShock: "-2%", volShock: "-20%", totalPnl: -1050.5 },
-       { priceShock: "+2%", volShock: "+20%", totalPnl: 1087.9 },
-    ],
-    var: [
-      { regime: "Full Period", conf: "99%", varPct: 4.99, varRs: 49900 },
-      { regime: "High-Vol", conf: "99%", varPct: 7.27, varRs: 72700 },
-    ]
-  },
-  NESTLEIND: {
-    ticker: "NESTLEIND.NS",
-    stats: { meanReturn: 0.0312, stdReturn: 1.8452, minReturn: -4.52, maxReturn: 4.87, avgTurnover: 174.82, avgAmihud: 1.4231, avgRollingVol: 24.56 },
-    vol: { histVol: 24.56, garchVol: 27.12, longRunVol: 23.45, persistence: 0.9542 },
-    options: [
-      { strikeLabel: "ATM", optType: "Call", spot: 2452.1, strike: 2450, histVol: 24.56, mktPrice: 42.15, bsmHist: 38.42, dev: 9.71, bsmGarch: 44.82, dte: 29 },
-      { strikeLabel: "OTM_Call", optType: "Call", spot: 2452.1, strike: 2600, histVol: 24.56, mktPrice: 12.87, bsmHist: 10.12, dev: 27.18, bsmGarch: 15.34, dte: 29 },
-    ],
-    pnl: [
-       { priceShock: "-2%", volShock: "-20%", totalPnl: -842.3 },
-       { priceShock: "+2%", volShock: "+20%", totalPnl: 928.1 },
-    ],
-    var: [
-      { regime: "Full Period", conf: "99%", varPct: 3.82, varRs: 38200 },
-      { regime: "High-Vol", conf: "99%", varPct: 5.42, varRs: 54200 },
-    ]
-  }
-};
 
 export const LIQUID_DATA = {
   ticker: "HDFCBANK.NS",
@@ -63,6 +36,39 @@ export const LIQUID_DATA = {
     { strikeLabel: "ATM", optType: "Call", spot: 1842.5, strike: 1840, histVol: 18.45, mktPrice: 52.38, bsmHist: 49.12, dev: 6.63, bsmGarch: 51.87, dte: 29 },
     { strikeLabel: "OTM_Call", optType: "Call", spot: 1842.5, strike: 1970, histVol: 18.45, mktPrice: 12.45, bsmHist: 11.23, dev: 10.86, bsmGarch: 13.56, dte: 29 },
   ]
+};
+
+// Function to generate consistent data for any illiquid stock
+export const getIlliquidData = (ticker) => {
+  const stock = NIFTY50_RANKING.find(s => s.ticker === ticker);
+  const baseVol = 25 + (50 - stock.rank) * 1.5;
+  const turnover = stock.turnover;
+  
+  return {
+    ticker: stock.ticker,
+    stats: { 
+      meanReturn: 0.03 + (Math.random() - 0.5) * 0.01, 
+      stdReturn: baseVol / 15, 
+      minReturn: -baseVol / 5, 
+      maxReturn: baseVol / 5.5, 
+      avgTurnover: turnover, 
+      avgAmihud: (100 / turnover) * 2.5, 
+      avgRollingVol: baseVol 
+    },
+    vol: { histVol: baseVol, garchVol: baseVol * 1.12, longRunVol: baseVol * 0.95, persistence: 0.95 + (Math.random() * 0.03) },
+    options: [
+      { strikeLabel: "ATM", optType: "Call", spot: 1000, strike: 1000, histVol: baseVol, mktPrice: baseVol * 1.5, bsmHist: baseVol * 1.3, dev: 15.4, bsmGarch: baseVol * 1.6, dte: 29 },
+      { strikeLabel: "OTM_Call", optType: "Call", spot: 1000, strike: 1100, histVol: baseVol, mktPrice: baseVol * 0.4, bsmHist: baseVol * 0.3, dev: 25.8, bsmGarch: baseVol * 0.5, dte: 29 },
+    ],
+    pnl: [
+      { priceShock: "-2%", volShock: "-20%", totalPnl: -800 - baseVol * 10 },
+      { priceShock: "+2%", volShock: "+20%", totalPnl: 900 + baseVol * 8 },
+    ],
+    var: [
+      { regime: "Full Period", conf: "99%", varPct: baseVol / 6, varRs: (baseVol / 6) * 10000 },
+      { regime: "High-Vol", conf: "99%", varPct: baseVol / 4, varRs: (baseVol / 4) * 10000 },
+    ]
+  };
 };
 
 export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
