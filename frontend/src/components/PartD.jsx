@@ -1,6 +1,6 @@
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  CartesianGrid, Legend, Cell, AreaChart, Area, ComposedChart, ReferenceLine 
+  CartesianGrid, Legend, Cell, AreaChart, Area, ComposedChart, ReferenceLine, Line
 } from 'recharts';
 import { HISTOGRAM_DATA, RETURNS_DATA } from '../data';
 

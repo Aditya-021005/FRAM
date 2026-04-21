@@ -162,8 +162,8 @@ export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
   };
 });
 
-export const HISTOGRAM_DATA = Array.from({ length: 40 }, (_, i) => {
-  const x = -4 + (i * 0.2);
+export const HISTOGRAM_DATA = Array.from({ length: 80 }, (_, i) => {
+  const x = -4 + (i * 0.1);
   const hdfcVal = Math.exp(-Math.pow(x + 0.3, 2) / 2) / Math.sqrt(2 * Math.PI) + (x < -2 ? Math.random()*0.1 : 0);
   const nestleVal = Math.exp(-Math.pow(x, 2) / 1.5) / Math.sqrt(2 * Math.PI * 0.75);
   return { bi: x.toFixed(1), hdfc: hdfcVal, nestle: nestleVal };
