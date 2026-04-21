@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
-import { LIQUID_DATA } from '../data';
+import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData } from '../data';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -16,6 +16,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function PartB({ illiquid }) {
   const liqOptions = LIQUID_DATA.options;
   const illiqOptions = illiquid.options;
+  const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
 
   const makeChartData = (options) => options.map(o => ({
     name: o.strikeLabel,
@@ -36,7 +37,7 @@ export default function PartB({ illiquid }) {
           <div className="chart-title">Pricing Models — {LIQUID_DATA.ticker}</div>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={makeChartData(liqOptions)}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
@@ -51,7 +52,7 @@ export default function PartB({ illiquid }) {
           <div className="chart-title">Pricing Models — {illiquid.ticker}</div>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={makeChartData(illiqOptions)}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
@@ -65,29 +66,38 @@ export default function PartB({ illiquid }) {
       </div>
 
       <div className="table-container">
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>Volatility Estimation Results</div>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>Volatility Estimation Summary (All Securities)</div>
         <table>
           <thead>
             <tr>
               <th>Security</th>
               <th>Historical Vol</th>
-              <th>Conditional Vol (GARCH)</th>
-              <th>Mean-Reversion Level</th>
+              <th>GARCH (1,1)</th>
+              <th>Persistence</th>
+              <th>Mean-Reversion</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr style={{ background: 'var(--bg-secondary)', fontWeight: 600 }}>
               <td>{LIQUID_DATA.ticker}</td>
               <td>{LIQUID_DATA.vol.histVol}%</td>
               <td>{LIQUID_DATA.vol.garchVol.toFixed(2)}%</td>
+              <td>{LIQUID_DATA.vol.persistence.toFixed(4)}</td>
               <td>{LIQUID_DATA.vol.longRunVol}%</td>
             </tr>
-            <tr>
-              <td>{illiquid.ticker}</td>
-              <td>{illiquid.vol.histVol}%</td>
-              <td>{illiquid.vol.garchVol.toFixed(2)}%</td>
-              <td>{illiquid.vol.longRunVol}%</td>
-            </tr>
+            {illiquidStocks.map(s => {
+              const data = getIlliquidData(s.ticker);
+              const isSelected = s.ticker === illiquid.ticker;
+              return (
+                <tr key={s.ticker} style={isSelected ? { background: 'var(--accent)', color: 'var(--accent-fg)' } : {}}>
+                  <td>{s.ticker} {isSelected && " (Selected)"}</td>
+                  <td>{data.vol.histVol}%</td>
+                  <td>{data.vol.garchVol.toFixed(2)}%</td>
+                  <td>{data.vol.persistence.toFixed(4)}</td>
+                  <td>{data.vol.longRunVol}%</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

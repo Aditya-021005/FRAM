@@ -1,14 +1,14 @@
-import { LIQUID_DATA } from '../data';
+import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData } from '../data';
 
 export default function PartC({ illiquid }) {
-  // Use mock portfolio data based on selected ticker
+  const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
   const mockPremium = illiquid.ticker.includes('NESTLE') ? 42150 : 32870;
 
   return (
     <div className="slide-up fade-in">
       <div className="section-header">
         <h2 className="section-title">Greeks & Portfolio Hedging</h2>
-        <p className="section-subtitle">Analysis for {illiquid.ticker}.</p>
+        <p className="section-subtitle">Analysis for {illiquid.ticker}. Impact of market liquidity on delta neutralize strategies.</p>
       </div>
 
       <div className="grid-2">
@@ -36,21 +36,29 @@ export default function PartC({ illiquid }) {
       </div>
 
       <div className="table-container" style={{ marginTop: 32 }}>
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>PnL Scenarios — {illiquid.ticker}</div>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>Scenario PnL Matrix (All Securities)</div>
         <table>
           <thead>
             <tr>
-              <th>Shock</th>
-              <th>Total PnL</th>
+              <th>Security</th>
+              <th>Bear Shock PnL (-2%, -20%)</th>
+              <th>Bull Shock PnL (+2%, +20%)</th>
+              <th>Residual Vol Risk</th>
             </tr>
           </thead>
           <tbody>
-            {(illiquid.pnl || []).map((d, i) => (
-              <tr key={i}>
-                <td>Index {d.priceShock} / Vol {d.volShock}</td>
-                <td><span className={`tag ${d.totalPnl >= 0 ? 'positive' : 'negative'}`}>₹{d.totalPnl.toFixed(1)}</span></td>
-              </tr>
-            ))}
+            {illiquidStocks.map(s => {
+              const data = getIlliquidData(s.ticker);
+              const isSelected = s.ticker === illiquid.ticker;
+              return (
+                <tr key={s.ticker} style={isSelected ? { background: 'var(--accent)', color: 'var(--accent-fg)' } : {}}>
+                  <td>{s.ticker} {isSelected && " (Selected)"}</td>
+                  <td><span style={{ color: isSelected ? 'inherit' : '#dc2626' }}>₹{data.pnl[0].totalPnl.toFixed(0)}</span></td>
+                  <td><span style={{ color: isSelected ? 'inherit' : '#16a34a' }}>₹{data.pnl[1].totalPnl.toFixed(0)}</span></td>
+                  <td>{ (data.vol.histVol * 0.1).toFixed(2) }%</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

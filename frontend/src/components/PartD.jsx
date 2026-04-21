@@ -1,11 +1,26 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { LIQUID_DATA, NIFTY50_RANKING, getIlliquidData } from '../data';
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 4, padding: '8px 12px', fontSize: 12, boxShadow: 'var(--shadow-sm)' }}>
+      <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
+      {payload.map((p, i) => (
+        <p key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}</p>
+      ))}
+    </div>
+  );
+};
 
 export default function PartD({ illiquid }) {
+  const illiquidStocks = NIFTY50_RANKING.filter(s => s.category === 'ILLIQUID');
+
   return (
     <div className="slide-up fade-in">
       <div className="section-header">
         <h2 className="section-title">Value at Risk (VaR) Analysis</h2>
-        <p className="section-subtitle">Comparing risk across regimes for {illiquid.ticker}.</p>
+        <p className="section-subtitle">Comparing risk across regimes for {illiquid.ticker}. Confidence level at 99%.</p>
       </div>
 
       <div className="grid-2" style={{ marginBottom: 32 }}>
@@ -13,7 +28,7 @@ export default function PartD({ illiquid }) {
           <div className="chart-title">99% 1-Day VaR (%) by Regime — {illiquid.ticker}</div>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={illiquid.var}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="regime" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip cursor={{ fill: 'var(--bg-muted)' }} />
@@ -25,31 +40,41 @@ export default function PartD({ illiquid }) {
           <div className="insight-title">💡 Risk Exposure</div>
           <div className="insight-text">
             {illiquid.ticker} shows elevated VaR levels. Under High-Volatility regimes, the potential 1-day loss 
-            is estimated at {illiquid.var[1]?.varPct}% (₹{illiquid.var[1]?.varRs.toLocaleString()} per 10L).
+            is significantly higher than in normal regimes, highlighting the impact of kurtosis in thin markets.
           </div>
         </div>
       </div>
 
       <div className="table-container">
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>VaR Summary Table — {illiquid.ticker}</div>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>Risk Summary Matrix (All Securities)</div>
         <table>
           <thead>
             <tr>
-              <th>Regime</th>
-              <th>Conf.</th>
-              <th>VaR (%)</th>
-              <th>VaR (₹ per 10L)</th>
+              <th>Security</th>
+              <th>Full Period VaR (99%)</th>
+              <th>High-Vol VaR (99%)</th>
+              <th>Capital at Risk (10L)</th>
             </tr>
           </thead>
           <tbody>
-            {(illiquid.var || []).map((v, i) => (
-              <tr key={i}>
-                <td>{v.regime}</td>
-                <td>{v.conf}</td>
-                <td>{v.varPct.toFixed(2)}%</td>
-                <td>₹{v.varRs.toLocaleString()}</td>
-              </tr>
-            ))}
+            <tr style={{ background: 'var(--bg-secondary)', fontWeight: 600 }}>
+              <td>{LIQUID_DATA.ticker} <span className="tag">Liquid</span></td>
+              <td>2.95%</td>
+              <td>4.39%</td>
+              <td>₹29,500</td>
+            </tr>
+            {illiquidStocks.map(s => {
+              const data = getIlliquidData(s.ticker);
+              const isSelected = s.ticker === illiquid.ticker;
+              return (
+                <tr key={s.ticker} style={isSelected ? { background: 'var(--accent)', color: 'var(--accent-fg)' } : {}}>
+                  <td>{s.ticker} {isSelected && " (Selected)"}</td>
+                  <td>{data.var[0].varPct.toFixed(2)}%</td>
+                  <td>{data.var[1].varPct.toFixed(2)}%</td>
+                  <td>₹{data.var[0].varRs.toLocaleString()}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
