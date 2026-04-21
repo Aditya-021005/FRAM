@@ -30,6 +30,7 @@ export const NIFTY50_RANKING = [
 
 export const LIQUID_DATA = {
   ticker: "HDFCBANK.NS",
+  rank: 1,
   stats: { meanReturn: 0.0412, stdReturn: 1.2834, minReturn: -3.87, maxReturn: 4.21, avgTurnover: 2847.31, avgAmihud: 0.0342, avgRollingVol: 18.45 },
   vol: { histVol: 18.45, garchVol: 20.87, longRunVol: 17.23, persistence: 0.9634 },
   options: [
@@ -46,6 +47,7 @@ export const getIlliquidData = (ticker) => {
   
   return {
     ticker: stock.ticker,
+    rank: stock.rank,
     stats: { 
       meanReturn: 0.03 + (Math.random() - 0.5) * 0.01, 
       stdReturn: baseVol / 15, 
@@ -57,8 +59,9 @@ export const getIlliquidData = (ticker) => {
     },
     vol: { histVol: baseVol, garchVol: baseVol * 1.12, longRunVol: baseVol * 0.95, persistence: 0.95 + (Math.random() * 0.03) },
     options: [
-      { strikeLabel: "ATM", optType: "Call", spot: 1000, strike: 1000, histVol: baseVol, mktPrice: baseVol * 1.5, bsmHist: baseVol * 1.3, dev: 15.4, bsmGarch: baseVol * 1.6, dte: 29 },
-      { strikeLabel: "OTM_Call", optType: "Call", spot: 1000, strike: 1100, histVol: baseVol, mktPrice: baseVol * 0.4, bsmHist: baseVol * 0.3, dev: 25.8, bsmGarch: baseVol * 0.5, dte: 29 },
+      { strikeLabel: "ATM", optType: "Call", spot: 1000, strike: 1000, histVol: baseVol, mktPrice: baseVol * 3.2, bsmHist: baseVol * 2.8, dev: 15.4, bsmGarch: baseVol * 3.5, dte: 29, delta: 0.48, gamma: 0.003, vega: 1.4 },
+      { strikeLabel: "OTM_Call", optType: "Call", spot: 1000, strike: 1100, histVol: baseVol, mktPrice: baseVol * 0.9, bsmHist: baseVol * 0.7, dev: 25.8, bsmGarch: baseVol * 1.1, dte: 29, delta: 0.12, gamma: 0.001, vega: 0.5 },
+      { strikeLabel: "OTM_Put", optType: "Put", spot: 1000, strike: 900, histVol: baseVol, mktPrice: baseVol * 1.2, bsmHist: baseVol * 1.0, dev: 20.2, bsmGarch: baseVol * 1.4, dte: 29, delta: -0.18, gamma: 0.0012, vega: 0.6 },
     ],
     pnl: [
       { priceShock: "-2%", volShock: "-20%", totalPnl: -800 - baseVol * 10 },
@@ -76,6 +79,7 @@ export const getLiquidData = (ticker) => {
   const turnover = stock.turnover;
   return {
     ticker: stock.ticker,
+    rank: stock.rank,
     stats: {
       meanReturn: parseFloat((0.04 + stock.rank * 0.002).toFixed(4)),
       stdReturn: parseFloat((baseVol / 14).toFixed(4)),
@@ -90,8 +94,8 @@ export const getLiquidData = (ticker) => {
       persistence: parseFloat((0.95 + stock.rank * 0.002).toFixed(4)),
     },
     options: [
-      { strikeLabel: "ATM", optType: "Call", mktPrice: parseFloat((baseVol * 2.8).toFixed(2)), bsmHist: parseFloat((baseVol * 2.6).toFixed(2)), bsmGarch: parseFloat((baseVol * 2.9).toFixed(2)), dte: 29 },
-      { strikeLabel: "OTM_Call", optType: "Call", mktPrice: parseFloat((baseVol * 0.7).toFixed(2)), bsmHist: parseFloat((baseVol * 0.6).toFixed(2)), bsmGarch: parseFloat((baseVol * 0.8).toFixed(2)), dte: 29 },
+      { strikeLabel: "ATM", optType: "Call", mktPrice: parseFloat((baseVol * 2.8).toFixed(2)), bsmHist: parseFloat((baseVol * 2.6).toFixed(2)), bsmGarch: parseFloat((baseVol * 2.9).toFixed(2)), dte: 29, delta: 0.52, gamma: 0.0025, vega: 1.2 },
+      { strikeLabel: "OTM_Call", optType: "Call", mktPrice: parseFloat((baseVol * 0.7).toFixed(2)), bsmHist: parseFloat((baseVol * 0.6).toFixed(2)), bsmGarch: parseFloat((baseVol * 0.8).toFixed(2)), dte: 29, delta: 0.15, gamma: 0.0008, vega: 0.4 },
     ],
     pnl: [
       { priceShock: "-2%", volShock: "-20%", totalPnl: parseFloat((-400 - baseVol * 8).toFixed(1)) },
