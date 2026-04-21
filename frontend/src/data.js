@@ -86,7 +86,29 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
   }
 
   // Fallback for others
-  return { ticker, rank, stats: {}, vol: {}, correlation: {}, options: [], pnlSummary: {}, pnlScenarios: [] };
+  const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const meanReturn = isLiquidGroup ? -0.1 + (seed % 10)/200 : 0.01 + (seed % 10)/1000;
+  const stdReturn = isLiquidGroup ? 1.4 + (seed % 5)/20 : 1.1 + (seed % 5)/50;
+  return {
+    ticker, rank,
+    stats: { meanReturn, stdReturn, minReturn: meanReturn - 3*stdReturn, maxReturn: meanReturn + 3*stdReturn, avgTurnover: stockInfo.turnover, avgAmihud: isLiquidGroup ? 0.0004 : 0.005, avgRollingVol: 15 },
+    vol: { histVol: 15, garchVol: 16, longRunVol: 15, persistence: 0.98 },
+    correlation: { vol_amihud: 0.20 },
+    options: [
+      { strikeLabel: "ATM", dte: 29, mktPrice: 50, bsmHist: 48, bsmGarch: 52, delta: 0.5, gamma: 0.002, vega: 1.0 },
+      { strikeLabel: "OTM_Call", dte: 29, mktPrice: 15, bsmHist: 14, bsmGarch: 16, delta: 0.15, gamma: 0.001, vega: 0.4 },
+      { strikeLabel: "OTM_Put", dte: 29, mktPrice: 18, bsmHist: 17, bsmGarch: 19, delta: -0.18, gamma: 0.001, vega: 0.5 }
+    ],
+    pnlSummary: {
+      strategy: "Dynamic Delta Hedge",
+      netDelta: 0.1234, netGamma: 0.001, netVega: 100, netPremium: 5000,
+      hedgeQty: -12.34, hedgeCost: -15000
+    },
+    pnlScenarios: [
+      { shock: "-2%", vShock: "-20%", total: -50, d: -100, g: 10, v: -20, h: 60 },
+      { shock: "+2%", vShock: "+20%", total: 80, d: 100, g: 10, v: 20, h: -50 }
+    ]
+  };
 };
 
 export const LIQUID_DATA = generateStockData("HDFCBANK.NS", true);
