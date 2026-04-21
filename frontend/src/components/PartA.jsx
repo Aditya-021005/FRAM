@@ -41,7 +41,6 @@ export default function PartA({ illiquid, liquid }) {
             <th></th>
             <th>Vol</th>
             <th>Amihud</th>
-            <th>Turnover Ratio</th>
           </tr>
         </thead>
         <tbody>
@@ -49,18 +48,10 @@ export default function PartA({ illiquid, liquid }) {
             <td style={{ fontWeight: 600 }}>Vol</td>
             <td>1.0000</td>
             <td>{s.correlation?.vol_amihud.toFixed(4) || '0.0000'}</td>
-            <td>{s.correlation?.vol_turnover.toFixed(4) || '0.0000'}</td>
           </tr>
           <tr>
             <td style={{ fontWeight: 600 }}>Amihud</td>
             <td>{s.correlation?.vol_amihud.toFixed(4) || '0.0000'}</td>
-            <td>1.0000</td>
-            <td>{s.correlation?.amihud_turnover.toFixed(4) || '0.0000'}</td>
-          </tr>
-          <tr>
-            <td style={{ fontWeight: 600 }}>Turnover Ratio</td>
-            <td>{s.correlation?.vol_turnover.toFixed(4) || '0.0000'}</td>
-            <td>{s.correlation?.amihud_turnover.toFixed(4) || '0.0000'}</td>
             <td>1.0000</td>
           </tr>
         </tbody>
