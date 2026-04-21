@@ -23,7 +23,7 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
   if (ticker === 'HDFCBANK.NS') {
     return {
       ticker, rank,
-      stats: { meanReturn: -0.2401, stdReturn: 1.5375, avgTurnover: 3034.01, avgAmihud: 0.0004, avgRollingVol: 14.85 },
+      stats: { meanReturn: -0.2401, stdReturn: 1.5375, minReturn: -5.4667, maxReturn: 5.5552, avgTurnover: 3034.01, avgAmihud: 0.0004, avgRollingVol: 18.82 },
       vol: { histVol: 14.85, garchVol: 45.29, longRunVol: 18.58, persistence: 1.0000 },
       correlation: { vol_amihud: 0.2379 },
       spot: 731.55,
@@ -41,7 +41,7 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
   if (ticker === 'NESTLEIND.NS') {
     return {
       ticker, rank,
-      stats: { meanReturn: 0.0111, stdReturn: 1.1604, avgTurnover: 138.58, avgAmihud: 0.007, avgRollingVol: 16.33 },
+      stats: { meanReturn: 0.0111, stdReturn: 1.1604, minReturn: -2.7249, maxReturn: 3.3969, avgTurnover: 138.58, avgAmihud: 0.007, avgRollingVol: 16.57 },
       vol: { histVol: 16.33, garchVol: 21.05, longRunVol: 8.88, persistence: 1.0000 },
       correlation: { vol_amihud: 0.1763 },
       spot: 1174.80,
@@ -57,11 +57,14 @@ const generateStockData = (ticker, isLiquidGroup = true) => {
     };
   }
 
-  // Fallback
+  // Fallback for others
+  const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const meanReturn = isLiquidGroup ? -0.1 + (seed % 10)/200 : 0.01 + (seed % 10)/1000;
+  const stdReturn = isLiquidGroup ? 1.4 + (seed % 5)/20 : 1.1 + (seed % 5)/50;
   return {
     ticker, rank,
-    stats: { meanReturn: 0.0, stdReturn: 1.2, avgTurnover: 500, avgAmihud: 0.005, avgRollingVol: 15.0 },
-    vol: { histVol: 15.0, garchVol: 16.0, longRunVol: 15.0, persistence: 0.98 },
+    stats: { meanReturn, stdReturn, minReturn: meanReturn - 3*stdReturn, maxReturn: meanReturn + 3*stdReturn, avgTurnover: stockInfo.turnover, avgAmihud: isLiquidGroup ? 0.0004 : 0.005, avgRollingVol: 15 },
+    vol: { histVol: 15, garchVol: 16, longRunVol: 15, persistence: 0.98 },
     correlation: { vol_amihud: 0.20 },
     options: [],
     var: [{ regime: "Normal", varPct: 1.5, varRs: 15000 }, { regime: "Stressed", varPct: 2.5, varRs: 25000 }]
@@ -76,19 +79,18 @@ export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
   const date = new Date(2025, 10, 1);
   date.setDate(date.getDate() + (i * 1.5));
   const p = i / 120;
-  
-  // liqVol needs to be "spiky" blue line from screenshot
-  const liqVol = 35 + Math.sin(i * 0.1) * 2 + (p > 0.8 ? (p - 0.8) * 150 : 0) + Math.random() * 5;
-  // illiqVol needs to be "smooth" red line from screenshot
-  const illiqVol = 32 + p * 15 + Math.sin(i * 0.05) * 1;
-  
+  const liqVolBase = 10 + (p < 0.6 ? p * 12 : 12 + (p-0.6)*110);
+  const liqVol = liqVolBase + Math.sin(i * 0.2) * 2;
+  const liqRet = (Math.random() - 0.5) * (liqVol / 400) + Math.sin(i * 0.1) * 0.002;
+  const liqAm = (Math.random() * 0.0005) + (Math.sin(i * 0.3) > 0.8 ? 0.0006 : 0);
+  const illiqVolBase = 8 + p * 14;
+  const illiqVol = illiqVolBase + Math.sin(i * 0.15) * 3;
+  const illiqRet = (Math.random() - 0.5) * (illiqVol / 300) + Math.sin(i * 0.08) * 0.003;
+  const illiqAm = (Math.random() * 0.012) + (Math.sin(i * 0.25) > 0.7 ? 0.010 : 0);
   return {
     date: date.toLocaleDateString("en-IN", { year:'2-digit', month: "short" }),
-    liqReturn: (Math.random()-0.5)*0.02,
-    illiqReturn: (Math.random()-0.5)*0.015,
-    liqVol, 
-    illiqVol,
-    liqAmihud: 0.0004 + Math.random()*0.0005,
-    illiqAmihud: 0.007 + Math.random()*0.01
+    liqReturn: liqRet, illiqReturn: illiqRet,
+    liqVol, illiqVol,
+    liqAmihud: liqAm, illiqAmihud: illiqAm
   };
 });
