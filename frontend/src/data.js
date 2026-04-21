@@ -110,13 +110,28 @@ export const getLiquidData = (ticker) => {
 
 
 export const RETURNS_DATA = Array.from({ length: 120 }, (_, i) => {
-  const date = new Date(2025, 9, 1);
+  const date = new Date(2025, 11, 1); // Start Dec 2025 like backend
   date.setDate(date.getDate() + i);
+  
+  const progress = i / 120;
+  
+  // mimics HDFCBANK (Liquid) trend: vol starts ~10%, ends ~45%
+  const liqVolScale = 10 + (progress < 0.6 ? progress * 10 : 10 + (progress - 0.6) * 100); 
+  const liqReturn = (Math.random() - 0.5) * (liqVolScale / 100) * 2;
+  const liqAmihud = Math.random() * 0.0008 + (progress > 0.8 ? Math.random() * 0.0006 : 0);
+
+  // mimics NESTLEIND (Illiquid) trend: vol starts ~8%, ends ~23%
+  const illiqVolScale = 8 + progress * 12 + Math.random() * 3;
+  const illiqReturn = (Math.random() - 0.5) * (illiqVolScale / 100) * 2;
+  const illiqAmihud = Math.random() * 0.015 + progress * 0.01;
+
   return {
     date: date.toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
-    liqReturn: (Math.sin(i * 0.3) * 1.2 + (Math.random() - 0.5) * 2.5) * 0.8,
-    illiqReturn: (Math.sin(i * 0.25 + 1) * 1.8 + (Math.random() - 0.5) * 4) * 0.9,
-    liqVol: 15 + Math.sin(i * 0.1) * 5 + Math.random() * 3,
-    illiqVol: 25 + Math.sin(i * 0.08 + 0.5) * 8 + Math.random() * 5,
+    liqReturn: liqReturn,
+    illiqReturn: illiqReturn,
+    liqVol: liqVolScale,
+    illiqVol: illiqVolScale,
+    liqAmihud: liqAmihud,
+    illiqAmihud: illiqAmihud
   };
 });

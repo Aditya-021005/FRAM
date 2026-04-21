@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line, ScatterChart, Scatter } from 'recharts';
 import { NIFTY50_RANKING, RETURNS_DATA, getIlliquidData, getLiquidData } from '../data';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -67,31 +67,108 @@ export default function PartA({ illiquid, liquid }) {
         </ResponsiveContainer>
       </div>
 
-      <div className="grid-2" style={{ marginTop: 32 }}>
+      <div className="grid-2" style={{ marginTop: 32, gap: '24px' }}>
+        {/* Row 1: Daily Log Returns */}
         <div className="chart-container">
-          <div className="chart-title">6-Month Returns Profile (%)</div>
-          <ResponsiveContainer width="100%" height={220}>
+          <div className="chart-title">Daily Log Returns — Liquid ({liquid.ticker.replace('.NS','')})</div>
+          <ResponsiveContainer width="100%" height={180}>
             <LineChart data={RETURNS_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="date" hide />
-              <YAxis tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} domain={[-0.06, 0.06]} />
               <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="liqReturn" name="Liquid" stroke="var(--chart-1)" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="illiqReturn" name="Illiquid" stroke="var(--chart-2)" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="liqReturn" stroke="var(--chart-1)" dot={false} strokeWidth={1} />
             </LineChart>
           </ResponsiveContainer>
         </div>
         <div className="chart-container">
-          <div className="chart-title">20-Day Rolling Volatility</div>
-          <ResponsiveContainer width="100%" height={220}>
+          <div className="chart-title">Daily Log Returns — Illiquid ({illiquid.ticker.replace('.NS','')})</div>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={RETURNS_DATA}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <XAxis dataKey="date" hide />
+              <YAxis tick={{ fontSize: 10 }} domain={[-0.06, 0.06]} />
+              <Tooltip content={<CustomTooltip />} />
+              <Line type="monotone" dataKey="illiqReturn" stroke="var(--chart-2)" dot={false} strokeWidth={1} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Row 2: Rolling Volatility */}
+        <div className="chart-container">
+          <div className="chart-title">20-Day Rolling Volatility — Liquid</div>
+          <ResponsiveContainer width="100%" height={180}>
             <LineChart data={RETURNS_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="liqVol" name="Liquid Vol" stroke="var(--chart-1)" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="illiqVol" name="Illiquid Vol" stroke="var(--chart-2)" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="liqVol" stroke="var(--chart-1)" dot={false} strokeWidth={2} />
             </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="chart-container">
+          <div className="chart-title">20-Day Rolling Volatility — Illiquid</div>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={RETURNS_DATA}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <XAxis dataKey="date" hide />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Line type="monotone" dataKey="illiqVol" stroke="var(--chart-2)" dot={false} strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Row 3: Amihud Illiquidity */}
+        <div className="chart-container">
+          <div className="chart-title">Amihud Illiquidity (×10⁻⁹) — Liquid</div>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={RETURNS_DATA}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <XAxis dataKey="date" hide />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Line type="monotone" dataKey="liqAmihud" stroke="var(--chart-1)" dot={false} strokeWidth={1} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="chart-container">
+          <div className="chart-title">Amihud Illiquidity (×10⁻⁹) — Illiquid</div>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={RETURNS_DATA}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+              <XAxis dataKey="date" hide />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Line type="monotone" dataKey="illiqAmihud" stroke="var(--chart-2)" dot={false} strokeWidth={1} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Row 4: Volatility vs Amihud Scatter */}
+        <div className="chart-container">
+          <div className="chart-title">Volatility vs Amihud — Liquid</div>
+          <ResponsiveContainer width="100%" height={180}>
+            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+              <XAxis type="number" dataKey="liqAmihud" name="Amihud" tick={{ fontSize: 10 }} />
+              <YAxis type="number" dataKey="liqVol" name="Rolling Vol" tick={{ fontSize: 10 }} />
+              <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+              <Scatter name="Liquid" data={RETURNS_DATA} fill="var(--chart-1)" fillOpacity={0.6} />
+            </ScatterChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="chart-container">
+          <div className="chart-title">Volatility vs Amihud — Illiquid</div>
+          <ResponsiveContainer width="100%" height={180}>
+            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+              <XAxis type="number" dataKey="illiqAmihud" name="Amihud" tick={{ fontSize: 10 }} />
+              <YAxis type="number" dataKey="illiqVol" name="Rolling Vol" tick={{ fontSize: 10 }} />
+              <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+              <Scatter name="Illiquid" data={RETURNS_DATA} fill="var(--chart-2)" fillOpacity={0.6} />
+            </ScatterChart>
           </ResponsiveContainer>
         </div>
       </div>
